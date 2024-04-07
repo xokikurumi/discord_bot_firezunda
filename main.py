@@ -1,5 +1,8 @@
 import discord
 import re
+import emoji
+# pip install emoji
+
 from discord import Intents, Client, Interaction
 from discord.app_commands import CommandTree
 from common import logger
@@ -15,6 +18,12 @@ from googletrans import Translator
 # 英語のみ反応させる
 # 他の言語は気が向いたら
 def isLang(msg):
+    # 前提処理
+    # 絵文字削除
+    msg = emoji.replace_emoji(msg)
+    msg = re.sub('^https?://[\\w/:%#\\$&\\?\\(\\)~\\.=\\+\\-]+$', '', msg)
+
+    #判定処理
     result = False
     checkList = [
         '^https?://[\\w/:%#\\$&\\?\\(\\)~\\.=\\+\\-]+$',
@@ -37,7 +46,12 @@ def isLang(msg):
             else:
                 result = False
                 break
-    
+
+    # 英文かどうかをチェック
+    if result:
+        if(not(re.match(r"^([A-Z@\*#\s][A-Za-z0-9\*_#]*)([A-Za-z0-9:<>\n\s/\.,'-?!\*_]+)([\s.\?\!:\n_])+$",msg, flags=re.MULTILINE))):
+            result = False
+
     return result
 
 class MyClient(discord.Client):
