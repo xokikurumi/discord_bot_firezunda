@@ -1,5 +1,8 @@
 import discord
 import re
+import emoji
+# pip install emoji
+
 from discord import Intents, Client, Interaction
 from discord.app_commands import CommandTree
 from common import logger
@@ -15,6 +18,12 @@ from googletrans import Translator
 # 英語のみ反応させる
 # 他の言語は気が向いたら
 def isLang(msg):
+    # 前提処理
+    # 絵文字削除
+    msg = emoji.replace_emoji(msg)
+    msg = re.sub('^https?://[\\w/:%#\\$&\\?\\(\\)~\\.=\\+\\-]+$', '', msg)
+
+    #判定処理
     result = False
     checkList = [
         '^https?://[\\w/:%#\\$&\\?\\(\\)~\\.=\\+\\-]+$',
@@ -37,7 +46,12 @@ def isLang(msg):
             else:
                 result = False
                 break
-    
+
+    # 英文かどうかをチェック
+    if result:
+        if(not(re.match(r"^([A-Z@\*#\s][A-Za-z0-9\*_#]*)([A-Za-z0-9:<>\n\s/\.,'-?!\*_]+)([\s.\?\!:\n_])+$",msg, flags=re.MULTILINE))):
+            result = False
+
     return result
 
 class MyClient(discord.Client):
@@ -61,15 +75,16 @@ class MyClient(discord.Client):
             if(diceLog["ok"]):
                 await message.channel.send(diceLog["text"])
                 return
-# <：ZND：1166641599674056725>
+
         if(isLang(message.content)):
-            if not(message.author.id == 1066346686127026236 or message.author.id == 986560084891041892):
-                tr = Translator()
-                result = tr.translate(message.content,src='en',dest='ja').text
-                result = result.replace('：', ':')
-                await message.channel.send(result)
-                print(result)
-                return
+            if message.author.bot:
+                # マイクラbot,v1除外
+                if not(message.author.id == 1066346686127026236 or message.author.id == 986560084891041892):
+                    tr = Translator()
+                    result = tr.translate(message.content,src='en',dest='ja').text
+                    result = result.replace('：', ':')
+                    await message.channel.send(result)
+                    return
 
 
 #         if message.content.startswith("入るぞ、ポプ子。大丈夫だ、私一人だ。武器も持っていない。ポプ子、終わりだ。もう逃げることはできない、狙撃手が狙っている。見ろ、この騒動を。ここはベトナムじゃない、アメリカだ。戦争は終わったんだ！"):
