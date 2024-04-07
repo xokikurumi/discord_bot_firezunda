@@ -20,7 +20,7 @@ def isLang(msg):
         '^https?://[\\w/:%#\\$&\\?\\(\\)~\\.=\\+\\-]+$',
         '[ぁ-んーァ-ヶｱ-ﾝﾞﾟ一-龠]+',
         '^((<:[a-zA-Z0-9]+:[0-9]+>)|(:.+:))+$',
-        '+',
+        '^[0-9]+.*',
         '^!',
         '^<@&[0-9]+>',
         '^[0-9]+',
@@ -58,8 +58,9 @@ class MyClient(discord.Client):
         # ダイスチェック
         if dice.isDice(message.content):
             diceLog = dice.getResultDice(message.content)
-            await message.channel.send(diceLog["text"])
-            return
+            if(diceLog["ok"]):
+                await message.channel.send(diceLog["text"])
+                return
 # <：ZND：1166641599674056725>
         if(isLang(message.content)):
             if not(message.author.id == 1066346686127026236 or message.author.id == 986560084891041892):
