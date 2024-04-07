@@ -41,7 +41,6 @@ def insert(query):
 
 	# データベース作成
 	result = cursor.execute(query)
-
 	# 接続を閉じる
 	cursor.close()
 	conn.commit()

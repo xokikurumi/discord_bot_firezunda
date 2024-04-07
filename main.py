@@ -5,7 +5,7 @@ from discord.app_commands import CommandTree
 from common import logger
 from common import dice
 from common import common
-# from API import earthQuek
+from API import earthQuek
 from discord.ext import commands
 from discord.ext import tasks
 from constants import token
@@ -25,6 +25,7 @@ def isLang(msg):
         '^<@&[0-9]+>',
         '^[0-9]+',
         '^[wW]+',
+        '^\\(\\)>',
         '\\[.*\\]\\(https?://[\\w/:%#\\$&\\?\\(\\)~\\.=\\+\\-]+\\)'
     ]
 
@@ -46,7 +47,7 @@ class MyClient(discord.Client):
 
     async def on_ready(self):
         print('Logged on as', self.user)
-        # self.earthQuek.start()
+        self.earthQuek.start()
 
     # 通常のメッセージが送信された場合
     async def on_message(self, message):
@@ -56,14 +57,15 @@ class MyClient(discord.Client):
             return
 
         # ダイスチェック
-        if dice.isDice(message.content):
-            diceLog = dice.getResultDice(message.content)
-            if(diceLog["ok"]):
-                await message.channel.send(diceLog["text"])
-                return
+        if not(message.author.id == 1208286469953953833 or message.author.id == 1226387089566994555):
+            if dice.isDice(message.content):
+                diceLog = dice.getResultDice(message.content)
+                if(diceLog["ok"]):
+                    await message.channel.send(diceLog["text"])
+                    return
 # <：ZND：1166641599674056725>
         if(isLang(message.content)):
-            if not(message.author.id == 1066346686127026236 or message.author.id == 986560084891041892):
+            if not(message.author.id == 1066346686127026236 or message.author.id == 986560084891041892 or message.author.id == 1208286469953953833):
                 tr = Translator()
                 result = tr.translate(message.content,src='en',dest='ja').text
                 result = result.replace('：', ':')
@@ -133,15 +135,36 @@ class MyClient(discord.Client):
 
             logger.info_voiceStatus(before, member.name + ' がボイスチャンネルを退出')
 
-    # @tasks.loop(seconds=1)
-    # async def earthQuek(self):
-    #     # 地震/津波速報
-    #     result = earthQuek.getInfomation(self)
-    #     for txt in result:
-    #         # 文字列を2000文字前後(改行コード毎計算)毎にデータを成形
-    #         msgs = common.msgSplit(txt)
-    #         for msg in msgs:
-    #             # self.get_guild(999999).get_channel(99999).send("内容")
+    @tasks.loop(seconds=1)
+    async def earthQuek(self):
+     # 地震/津波速報
+     result = earthQuek.getInfomation(self)
+     # ギルド・チャンネル・メンション一覧を取得
+     channels = earthQuek.getChannels(self)
+     if len(result) > 0:
+         for serverData in channels:
+            if serverData[2] == 'everyone':
+                await self.get_guild(int(serverData[0])).get_channel(int(serverData[1])).send("@everyone 災害情報")
+            else:
+                await self.get_guild(int(serverData[0])).get_channel(int(serverData[1])).send(serverData[2] + " 災害情報")
+
+            for txt in result:
+                 # 文字列を2000文字前後(改行コード毎計算)毎にデータを成形
+                sendData = None
+                first = True
+                dataCnt = 0
+                for text2 in txt:
+                    if first:
+                        sendData = discord.Embed(title=text2[0], description=text2[1], color= 0xff0000)
+                        first = False
+                    else:
+                        if (1< dataCnt and dataCnt < 9):
+
+                            sendData.add_field(name=text2[0], value=text2[1], inline = True)
+                        else: 
+                            sendData.add_field(name=text2[1], value='', inline = False)
+                    dataCnt = dataCnt + 1
+                await self.get_guild(int(serverData[0])).get_channel(int(serverData[1])).send(embed=sendData)
 
 intents = discord.Intents.default()
 intents.message_content = True

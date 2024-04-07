@@ -7,8 +7,10 @@ from constants import constants
 
 
 def getChannels(self):
+	queryData = db.select("SELECT guild_id,channel_id,mention FROM earth_quake_send;")
+#	print(queryData)
+	return queryData
 
-	db.select("")
 def getInfomation(self):
 	result = []
 	res = http.getJSON("https://api.p2pquake.net/v2/history?codes=551&codes=552&codes=556&limit=10")
@@ -17,188 +19,217 @@ def getInfomation(self):
 		query = "SELECT count(*) AS cnt FROM auto_send_log WHERE log_key_1 = '" + jd["id"] + "'"
 		queryData = db.select(query)
 		
-			
+		
 		if(queryData[0][0] == 0):
 			# IDを登録する
-			points = jd["points"]
-			if(len(points) > 0):
-				query = "INSERT INTO auto_send_log( log_key_1, log_key_2, log_key_3 )VALUES( '" + jd["id"] + "', '" + str(jd["earthquake"]["hypocenter"]["latitude"]) + "', '" + str(jd["earthquake"]["hypocenter"]["longitude"]) + "' )"
-				db.insert(query)
+			# 551(地震情報)
+			if jd["code"] == '551':
+				points = jd["points"]
+				if(len(points) > 0):
+					query = "INSERT INTO auto_send_log( log_key_1, log_key_2, log_key_3 )VALUES( '" + jd["id"] + "', '" + str(jd["earthquake"]["hypocenter"]["latitude"]) + "', '" + str(jd["earthquake"]["hypocenter"]["longitude"]) + "' )"
+					db.insert(query)
 
-				# 過去に投稿されたデータではない場合
-				resultData = []
-				rowData = "[roll] \n"
-				rowData += "# :earth_africa: 【地震速報】 :earth_africa:"
-				rowData += "==========================================="
-				rowData += "発生時刻: " + jd["issue"]["time"] + "\n"
-				rowData += "震源地: " + jd["earthquake"]["hypocenter"]["name"] + "\n"
-				rowData += "震源の深さ: " + str(jd["earthquake"]["hypocenter"]["depth"]) + "km" + "\n"
-				rowData += "マグニチュード: " + str(jd["earthquake"]["hypocenter"]["magnitude"]) + "\n"
-				rowData += "最大震度: " + scale(int(jd["earthquake"]["maxScale"])) + "\n"
-				rowData += "津波(国内): " + tsunami(jd["earthquake"]["domesticTsunami"]) + "\n"
-				rowData += "津波(海外): " + tsunami(jd["earthquake"]["foreignTsunami"]) + "\n"
-				rowData += "===========================================\n"
+					# 過去に投稿されたデータではない場合
+					resultData = []
+					rowData = '[roll] \n'
 
-				# 震度情報整理
-				scale_10 = []
-				scale_20 = []
-				scale_30 = []
-				scale_40 = []
-				scale_45 = []
-				scale_50 = []
-				scale_55 = []
-				scale_60 = []
-				scale_70 = []
+					resultData.append([':earth_africa: 【地震速報】 :earth_africa:' ,''])
+					#2行目
+					resultData.append(['発生時刻' ,jd["issue"]["time"] + ''])
+					#3行目
+					resultData.append(['震源地' ,jd["earthquake"]["hypocenter"]["name"] + ''])
+					resultData.append(['震源の深さ' ,str(jd["earthquake"]["hypocenter"]["depth"]) + 'km' + ''])
+					# 4行目
+					resultData.append(['マグニチュード' ,str(jd["earthquake"]["hypocenter"]["magnitude"]) + ''])
+					resultData.append(['最大震度' ,scale(int(jd["earthquake"]["maxScale"])) + ''])
+					# 5行目
+					resultData.append(['津波(国内)' ,tsunami(jd["earthquake"]["domesticTsunami"]) + ''])
+					resultData.append(['津波(海外)' ,tsunami(jd["earthquake"]["foreignTsunami"]) + ''])
+					# 6行目移行
 
-				image_scale_10 = []
-				image_scale_20 = []
-				image_scale_30 = []
-				image_scale_40 = []
-				image_scale_45 = []
-				image_scale_50 = []
-				image_scale_55 = []
-				image_scale_60 = []
-				image_scale_70 = []
-				
-				for point in jd["points"]:
+					# 震度情報整理
+					scale_10 = []
+					scale_20 = []
+					scale_30 = []
+					scale_40 = []
+					scale_45 = []
+					scale_50 = []
+					scale_55 = []
+					scale_60 = []
+					scale_70 = []
 
+					image_scale_10 = []
+					image_scale_20 = []
+					image_scale_30 = []
+					image_scale_40 = []
+					image_scale_45 = []
+					image_scale_50 = []
+					image_scale_55 = []
+					image_scale_60 = []
+					image_scale_70 = []
+					
+					# 詳細情報の集計
+					for point in jd["points"]:
 
-					if point["scale"] == 10:
-						# テキストで送信する場合
-						scale_10.append([point["pref"], point["addr"]])
+						# 震度1
+						if point["scale"] == 10:
+							# テキストで送信する場合
+							scale_10.append([point["pref"], point["addr"]])
 
-						# 画像で送信する用
-						image_scale_10.append([point["pref"], point["addr"]])
-					if point["scale"] == 20:
-						# テキストで送信する場合
-						scale_20.append([point["pref"], point["addr"]])
+							# 画像で送信する用
+							image_scale_10.append([point["pref"], point["addr"]])
 
-						# 画像で送信する用
-						image_scale_20.append([point["pref"], point["addr"]])
-					if point["scale"] == 30:
-						# テキストで送信する場合
-						scale_30.append([point["pref"], point["addr"]])
+						# 震度2
+						if point["scale"] == 20:
+							# テキストで送信する場合
+							scale_20.append([point["pref"], point["addr"]])
 
-						# 画像で送信する用
-						image_scale_30.append([point["pref"], point["addr"]])
-					if point["scale"] == 40:
-						# テキストで送信する場合
-						scale_40.append([point["pref"], point["addr"]])
+							# 画像で送信する用
+							image_scale_20.append([point["pref"], point["addr"]])
+						# 震度3
+						if point["scale"] == 30:
+							# テキストで送信する場合
+							scale_30.append([point["pref"], point["addr"]])
 
-						# 画像で送信する用
-						image_scale_40.append([point["pref"], point["addr"]])
-					if point["scale"] == 45:
-						# テキストで送信する場合
-						scale_45.append([point["pref"], point["addr"]])
+							# 画像で送信する用
+							image_scale_30.append([point["pref"], point["addr"]])
 
-						# 画像で送信する用
-						image_scale_45.append([point["pref"], point["addr"]])
-					if point["scale"] == 50:
-						# テキストで送信する場合
-						scale_50.append([point["pref"], point["addr"]])
+						# 震度4
+						if point["scale"] == 40:
+							# テキストで送信する場合
+							scale_40.append([point["pref"], point["addr"]])
 
-						# 画像で送信する用
-						image_scale_50.append([point["pref"], point["addr"]])
-					if point["scale"] == 55:
-						# テキストで送信する場合
-						scale_55.append([point["pref"], point["addr"]])
+							# 画像で送信する用
+							image_scale_40.append([point["pref"], point["addr"]])
 
-						# 画像で送信する用
-						image_scale_55.append([point["pref"], point["addr"]])
-					if point["scale"] == 60:
-						# テキストで送信する場合
-						scale_60.append([point["pref"], point["addr"]])
+						# 震度5弱
+						if point["scale"] == 45:
+							# テキストで送信する場合
+							scale_45.append([point["pref"], point["addr"]])
 
-						# 画像で送信する用
-						image_scale_60.append([point["pref"], point["addr"]])
-					if point["scale"] == 70:
-						# テキストで送信する場合
-						scale_70.append([point["pref"], point["addr"]])
+							# 画像で送信する用
+							image_scale_45.append([point["pref"], point["addr"]])
 
-						# 画像で送信する用
-						image_scale_70.append([point["pref"], point["addr"]])
-					if point["scale"] == -1:
-						
-				# 地震情報テキストの生成
-				if(len(scale_70) > 0):
-					rowData += "## 【震度7】"
-					pref = ""
-					for x in scale_70:
-						if(pref == x[0]):
-							rowData += re.sub(".*","　" ,pref) + " " x[1] + "\n"
-						else:
-							pref = x[0]
-							rowData += x[0] + " " + x[1] + "\n"
-				
-				if(len(scale_60) > 0):
-					rowData += "## 【震度6強】"
-					pref = ""
-					for x in scale_60:
-						if(pref == x[0]):
-							rowData += re.sub(".*","　" ,x[0]) + " " x[1] + "\n"
-						else:
-							pref = x[0]
-							rowData += x[0] + " " + x[1] + "\n"
+						# 震度5強
+						if point["scale"] == 50:
+							# テキストで送信する場合
+							scale_50.append([point["pref"], point["addr"]])
 
-				if(len(scale_55) > 0):
-					rowData += "## 【震度6弱】"
-					pref = ""
-					for x in scale_55:
-						if(pref == x[0]):
-							rowData += re.sub(".*","　" ,x[0]) + " " x[1] + "\n"
-						else:
-							pref = x[0]
-							rowData += x[0] + " " + x[1] + "\n"
+							# 画像で送信する用
+							image_scale_50.append([point["pref"], point["addr"]])
+
+						# 震度6弱
+						if point["scale"] == 55:
+							# テキストで送信する場合
+							scale_55.append([point["pref"], point["addr"]])
+
+							# 画像で送信する用
+							image_scale_55.append([point["pref"], point["addr"]])
+
+						# 震度6強
+						if point["scale"] == 60:
+							# テキストで送信する場合
+							scale_60.append([point["pref"], point["addr"]])
+
+							# 画像で送信する用
+							image_scale_60.append([point["pref"], point["addr"]])
+
+						# 震度7
+						if point["scale"] == 70:
+							# テキストで送信する場合
+							scale_70.append([point["pref"], point["addr"]])
+
+							# 画像で送信する用
+							image_scale_70.append([point["pref"], point["addr"]])
 							
+					# 地震情報テキストの生成
+					if len(scale_70) > 0:
+						resultData.append(['', '--------------------------------------------------'])
+						resultData.append(['', '【震度7】'])
+						pref = ''
+						for x in scale_70:
+							if(pref == x[0]):
+								resultData.append(['', re.sub('.*','　' ,pref) + ' ' + x[1]])
+							else:
+								pref = x[0]
+								resultData.append(['', x[0] + ' ' + x[1]])
+					
+					if len(scale_60) > 0:
+						resultData.append(['', '--------------------------------------------------'])
+						resultData.append(['', '【震度6強】'])
+						pref = ''
+						for x in scale_60:
+							if(pref == x[0]):
+								resultData.append(['', re.sub('.*','　' ,pref) + ' ' + x[1]])
+							else:
+								pref = x[0]
+								resultData.append(['', x[0] + ' ' + x[1]])
 
-				if(len(scale_50) > 0):
-					rowData += "## 【震度5強】"
-					pref = ""
-					for x in scale_50:
-						if(pref == x[0]):
-							rowData += re.sub(".*","　" ,x[0]) + " " x[1] + "\n"
-						else:
-							pref = x[0]
-							rowData += x[0] + " " + x[1] + "\n"
-							
+					if len(scale_55) > 0:
+						resultData.append(['', '--------------------------------------------------'])
+						resultData.append(['', '【震度6弱】'])
+						pref = ''
+						for x in scale_55:
+							if(pref == x[0]):
+								resultData.append(['', re.sub('.*','　' ,pref) + ' ' + x[1]])
+							else:
+								pref = x[0]
+								resultData.append(['', x[0] + ' ' + x[1]])
 
-				if(len(scale_45) > 0):
-					rowData += "### 【震度5弱】"
-					pref = ""
-					for x in scale_45:
-						if(pref == x[0]):
-							rowData += re.sub(".*","　" ,x[0]) + " " x[1] + "\n"
-						else:
-							pref = x[0]
-							rowData += x[0] + " " + x[1] + "\n"
-							
+					if len(scale_50) > 0:
+						resultData.append(['', '--------------------------------------------------'])
+						resultData.append(['', '【震度5強】'])
+						pref = ''
+						for x in scale_50:
+							if(pref == x[0]):
+								resultData.append(['', re.sub('.*','　' ,pref) + ' ' + x[1]])
+							else:
+								pref = x[0]
+								resultData.append(['', x[0] + ' ' + x[1]])
 
-				if(len(scale_40) > 0):
-					rowData += "### 【震度4】"
-					pref = ""
-					for x in scale_40:
-						if(pref == x[0]):
-							rowData += re.sub(".*","　" ,x[0]) + " " x[1] + "\n"
-						else:
-							pref = x[0]
-							rowData += x[0] + " " + x[1] + "\n"
-							
+					if len(scale_45) > 0:
+						resultData.append(['', '--------------------------------------------------'])
+						resultData.append(['', '【震度5弱】'])
+						pref = ''
+						for x in scale_45:
+							if(pref == x[0]):
+								resultData.append(['', re.sub('.*','　' ,pref) + ' ' + x[1]])
+							else:
+								pref = x[0]
+								resultData.append(['', x[0] + ' ' + x[1]])
 
-				if(len(scale_30) > 0):
-					rowData += "### 【震度3】"
-					pref = ""
-					for x in scale_30:
-						if(pref == x[0]):
-							rowData += re.sub(".*","　" ,x[0]) + " " x[1] + "\n"
-						else:
-							pref = x[0]
-							rowData += x[0] + " " + x[1] + "\n"
+					if len(scale_40) > 0:
+						resultData.append(['', '--------------------------------------------------'])
+						resultData.append(['', '【震度4】'])
+						pref = ''
+						for x in scale_40:
+							if(pref == x[0]):
+								resultData.append(['', re.sub('.*','　' ,pref) + ' ' + x[1]])
+							else:
+								pref = x[0]
+								resultData.append(['', x[0] + ' ' + x[1]])
 
-				# 速報画像生成
+					if len(scale_30) > 0:
+						resultData.append(['', '--------------------------------------------------'])
+						resultData.append(['', '【震度3】'])
+						pref = ''
+						for x in scale_30:
+							if(pref == x[0]):
+								resultData.append(['', re.sub('.*','　' ,pref) + ' ' + x[1]])
+							else:
+								pref = x[0]
+								resultData.append(['', x[0] + ' ' + x[1]])
 
-				resultData.append(rowData)
-				result.append(resultData);
-	# print(result)
+					# 速報画像生成
+					if (len(scale_70) > 0 or len(scale_60) > 0 or len(scale_55) > 0 or len(scale_50) > 0 or len(scale_45) > 0 or len(scale_40) > 0):
+						result.append(resultData)
+
+			# 552(津波予報)
+#			if jd["code"] == '552':
+
+			# 556(緊急地震速報（警報）
+#			if jd["code"] == '552':
+#	print(result)
 	return result
 
 def scale(type):
