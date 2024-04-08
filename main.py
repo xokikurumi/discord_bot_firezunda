@@ -137,34 +137,46 @@ class MyClient(discord.Client):
 
     @tasks.loop(seconds=1)
     async def earthQuek(self):
-     # 地震/津波速報
-     result = earthQuek.getInfomation(self)
-     # ギルド・チャンネル・メンション一覧を取得
-     channels = earthQuek.getChannels(self)
-     if len(result) > 0:
-         for serverData in channels:
-            if serverData[2] == 'everyone':
-                await self.get_guild(int(serverData[0])).get_channel(int(serverData[1])).send("@everyone 災害情報")
-            else:
-                await self.get_guild(int(serverData[0])).get_channel(int(serverData[1])).send(serverData[2] + " 災害情報")
+        # 地震/津波速報
+        result = earthQuek.getInfomation(self)
+        # ギルド・チャンネル・メンション一覧を取得
+        channels = earthQuek.getChannels(self)
 
-            for txt in result:
-                 # 文字列を2000文字前後(改行コード毎計算)毎にデータを成形
-                sendData = None
-                first = True
-                dataCnt = 0
-                for text2 in txt:
-                    if first:
-                        sendData = discord.Embed(title=text2[0], description=text2[1], color= 0xff0000)
-                        first = False
-                    else:
-                        if (1< dataCnt and dataCnt < 9):
+        if len(result) > 0:
+             for serverData in channels:
+                if serverData[2] == 'everyone':
+                    await self.get_guild(int(serverData[0])).get_channel(int(serverData[1])).send("@everyone 災害情報")
+                else:
+                    await self.get_guild(int(serverData[0])).get_channel(int(serverData[1])).send(serverData[2] + " 災害情報")
 
-                            sendData.add_field(name=text2[0], value=text2[1], inline = True)
-                        else: 
-                            sendData.add_field(name=text2[1], value='', inline = False)
-                    dataCnt = dataCnt + 1
-                await self.get_guild(int(serverData[0])).get_channel(int(serverData[1])).send(embed=sendData)
+                for txt in result:
+                     # 文字列を2000文字前後(改行コード毎計算)毎にデータを成形
+                    sendData = None
+                    first = True
+                    headerView = False
+                    dataCnt = 0
+                    for text2 in txt:
+                        if first:
+                            sendData = discord.Embed(title=text2[0], description=text2[1], color= 0xff0000)
+                            first = False
+                        else:
+                            if (1< dataCnt and dataCnt < 8):
+
+                                sendData.add_field(name=text2[0], value=text2[1], inline = True)
+
+                                if dataCnt == 7:
+                                    await self.get_guild(int(serverData[0])).get_channel(int(serverData[1])).send(embed=sendData)
+                                    sendData = discord.Embed(color= 0xff0000)
+                            else: 
+                                sendData.add_field(name=text2[1], value='', inline = False)
+
+                            if dataCnt == 24:
+                                dataCnt = 9
+                                await self.get_guild(int(serverData[0])).get_channel(int(serverData[1])).send(embed=sendData)
+                                sendData = discord.Embed(color= 0xff0000)
+                        dataCnt = dataCnt + 1
+                    if dataCnt >= 9:
+                        await self.get_guild(int(serverData[0])).get_channel(int(serverData[1])).send(embed=sendData)
 
 intents = discord.Intents.default()
 intents.message_content = True

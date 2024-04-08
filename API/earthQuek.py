@@ -23,11 +23,9 @@ def getInfomation(self):
 		if(queryData[0][0] == 0):
 			# IDを登録する
 			# 551(地震情報)
-			if jd["code"] == '551':
+			if jd["code"] == 551:
 				points = jd["points"]
 				if(len(points) > 0):
-					query = "INSERT INTO auto_send_log( log_key_1, log_key_2, log_key_3 )VALUES( '" + jd["id"] + "', '" + str(jd["earthquake"]["hypocenter"]["latitude"]) + "', '" + str(jd["earthquake"]["hypocenter"]["longitude"]) + "' )"
-					db.insert(query)
 
 					# 過去に投稿されたデータではない場合
 					resultData = []
@@ -77,7 +75,7 @@ def getInfomation(self):
 							scale_10.append([point["pref"], point["addr"]])
 
 							# 画像で送信する用
-							image_scale_10.append([point["pref"], point["addr"]])
+							image_scale_10.append([point["pref"], point["addr"], '1'])
 
 						# 震度2
 						if point["scale"] == 20:
@@ -85,14 +83,14 @@ def getInfomation(self):
 							scale_20.append([point["pref"], point["addr"]])
 
 							# 画像で送信する用
-							image_scale_20.append([point["pref"], point["addr"]])
+							image_scale_20.append([point["pref"], point["addr"], '2'])
 						# 震度3
 						if point["scale"] == 30:
 							# テキストで送信する場合
 							scale_30.append([point["pref"], point["addr"]])
 
 							# 画像で送信する用
-							image_scale_30.append([point["pref"], point["addr"]])
+							image_scale_30.append([point["pref"], point["addr"], '3'])
 
 						# 震度4
 						if point["scale"] == 40:
@@ -100,7 +98,7 @@ def getInfomation(self):
 							scale_40.append([point["pref"], point["addr"]])
 
 							# 画像で送信する用
-							image_scale_40.append([point["pref"], point["addr"]])
+							image_scale_40.append([point["pref"], point["addr"], '4'])
 
 						# 震度5弱
 						if point["scale"] == 45:
@@ -108,7 +106,7 @@ def getInfomation(self):
 							scale_45.append([point["pref"], point["addr"]])
 
 							# 画像で送信する用
-							image_scale_45.append([point["pref"], point["addr"]])
+							image_scale_45.append([point["pref"], point["addr"], '5m'])
 
 						# 震度5強
 						if point["scale"] == 50:
@@ -116,7 +114,7 @@ def getInfomation(self):
 							scale_50.append([point["pref"], point["addr"]])
 
 							# 画像で送信する用
-							image_scale_50.append([point["pref"], point["addr"]])
+							image_scale_50.append([point["pref"], point["addr"], '5'])
 
 						# 震度6弱
 						if point["scale"] == 55:
@@ -124,7 +122,7 @@ def getInfomation(self):
 							scale_55.append([point["pref"], point["addr"]])
 
 							# 画像で送信する用
-							image_scale_55.append([point["pref"], point["addr"]])
+							image_scale_55.append([point["pref"], point["addr"], '6m'])
 
 						# 震度6強
 						if point["scale"] == 60:
@@ -132,7 +130,7 @@ def getInfomation(self):
 							scale_60.append([point["pref"], point["addr"]])
 
 							# 画像で送信する用
-							image_scale_60.append([point["pref"], point["addr"]])
+							image_scale_60.append([point["pref"], point["addr"], '6'])
 
 						# 震度7
 						if point["scale"] == 70:
@@ -140,7 +138,7 @@ def getInfomation(self):
 							scale_70.append([point["pref"], point["addr"]])
 
 							# 画像で送信する用
-							image_scale_70.append([point["pref"], point["addr"]])
+							image_scale_70.append([point["pref"], point["addr"], '7'])
 							
 					# 地震情報テキストの生成
 					if len(scale_70) > 0:
@@ -148,81 +146,55 @@ def getInfomation(self):
 						resultData.append(['', '【震度7】'])
 						pref = ''
 						for x in scale_70:
-							if(pref == x[0]):
-								resultData.append(['', re.sub('.*','　' ,pref) + ' ' + x[1]])
-							else:
-								pref = x[0]
-								resultData.append(['', x[0] + ' ' + x[1]])
+							resultData.append(['', x[0] + ' ' + x[1]])
 					
 					if len(scale_60) > 0:
 						resultData.append(['', '--------------------------------------------------'])
 						resultData.append(['', '【震度6強】'])
 						pref = ''
 						for x in scale_60:
-							if(pref == x[0]):
-								resultData.append(['', re.sub('.*','　' ,pref) + ' ' + x[1]])
-							else:
-								pref = x[0]
-								resultData.append(['', x[0] + ' ' + x[1]])
+							resultData.append(['', x[0] + ' ' + x[1]])
 
 					if len(scale_55) > 0:
 						resultData.append(['', '--------------------------------------------------'])
 						resultData.append(['', '【震度6弱】'])
 						pref = ''
 						for x in scale_55:
-							if(pref == x[0]):
-								resultData.append(['', re.sub('.*','　' ,pref) + ' ' + x[1]])
-							else:
-								pref = x[0]
-								resultData.append(['', x[0] + ' ' + x[1]])
+							resultData.append(['', x[0] + ' ' + x[1]])
 
 					if len(scale_50) > 0:
 						resultData.append(['', '--------------------------------------------------'])
 						resultData.append(['', '【震度5強】'])
 						pref = ''
 						for x in scale_50:
-							if(pref == x[0]):
-								resultData.append(['', re.sub('.*','　' ,pref) + ' ' + x[1]])
-							else:
-								pref = x[0]
-								resultData.append(['', x[0] + ' ' + x[1]])
+							resultData.append(['', x[0] + ' ' + x[1]])
 
 					if len(scale_45) > 0:
 						resultData.append(['', '--------------------------------------------------'])
 						resultData.append(['', '【震度5弱】'])
 						pref = ''
 						for x in scale_45:
-							if(pref == x[0]):
-								resultData.append(['', re.sub('.*','　' ,pref) + ' ' + x[1]])
-							else:
-								pref = x[0]
-								resultData.append(['', x[0] + ' ' + x[1]])
+							resultData.append(['', x[0] + ' ' + x[1]])
 
 					if len(scale_40) > 0:
 						resultData.append(['', '--------------------------------------------------'])
 						resultData.append(['', '【震度4】'])
 						pref = ''
 						for x in scale_40:
-							if(pref == x[0]):
-								resultData.append(['', re.sub('.*','　' ,pref) + ' ' + x[1]])
-							else:
-								pref = x[0]
-								resultData.append(['', x[0] + ' ' + x[1]])
+							resultData.append(['', x[0] + ' ' + x[1]])
 
 					if len(scale_30) > 0:
 						resultData.append(['', '--------------------------------------------------'])
 						resultData.append(['', '【震度3】'])
 						pref = ''
 						for x in scale_30:
-							if(pref == x[0]):
-								resultData.append(['', re.sub('.*','　' ,pref) + ' ' + x[1]])
-							else:
-								pref = x[0]
-								resultData.append(['', x[0] + ' ' + x[1]])
+							resultData.append(['', x[0] + ' ' + x[1]])
 
 					# 速報画像生成
 					if (len(scale_70) > 0 or len(scale_60) > 0 or len(scale_55) > 0 or len(scale_50) > 0 or len(scale_45) > 0 or len(scale_40) > 0):
 						result.append(resultData)
+						query = "INSERT INTO auto_send_log( log_key_1, log_key_2, log_key_3 )VALUES( '" + jd["id"] + "', '" + str(jd["earthquake"]["hypocenter"]["latitude"]) + "', '" + str(jd["earthquake"]["hypocenter"]["longitude"]) + "' )"
+						db.insert(query)
 
 			# 552(津波予報)
 #			if jd["code"] == '552':
