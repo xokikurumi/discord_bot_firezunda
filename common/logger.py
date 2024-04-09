@@ -140,3 +140,37 @@ def info_voiceStatus(event, msg):
     file = open(filePath, 'a', encoding='UTF-8')
     file.write(logMsg + "\n")
     file.close()
+
+
+def info_reaction(reaction, user, msg):
+    time = datetime.datetime.now()
+    # ログファイル ヘッダー部生成
+    logMsg = '[' + time.strftime('%Y/%m/%d %H:%M:%S.%f') + ']'
+    if user.nick == None:
+        logMsg += '[name:' + user.name+ '/nick: NONE/global: ' + user.global_name + ']'
+    else:
+        logMsg += '[name:' + user.name+ '/nick: ' + user.nick + '/global: ' + user.global_name + ']'
+
+    logMsg += '[' + str(reaction.message.id) + ']'
+
+    # 添付ファイルなし
+    logMsg += '[NONE]'
+
+    logMsg += '[NONE] '
+
+    # メッセージ本体を生成
+    print(type(reaction.emoji))
+    if type(reaction.emoji) is str:
+        logMsg += '[REACTION]' + reaction.emoji + ' count: ' + str(reaction.count) + ' Message: ' + msg
+    else:
+        logMsg += '[REACTION]<' + reaction.emoji.name + ':' + str(reaction.emoji.id) + '> count: ' + str(reaction.count) + ' Message: ' + msg
+    print(logMsg)
+    
+    # ファイル保存
+    filePath = setting.LOG_FILE_PATH + reaction.message.guild.name + "\\" + time.strftime('%Y%m%d')
+    os.makedirs(filePath, exist_ok=True)
+
+    filePath += '\\' + reaction.message.channel.type.name + "_" + str(reaction.message.channel.id) + "_" + reaction.message.channel.name + ".log"
+    file = open(filePath, 'a', encoding='UTF-8')
+    file.write(logMsg + "\n")
+    file.close()
