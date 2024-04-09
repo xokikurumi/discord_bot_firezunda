@@ -159,7 +159,6 @@ def info_reaction(reaction, user, msg):
     logMsg += '[NONE] '
 
     # メッセージ本体を生成
-    print(type(reaction.emoji))
     if type(reaction.emoji) is str:
         logMsg += '[REACTION]' + reaction.emoji + ' count: ' + str(reaction.count) + ' Message: ' + msg
     else:
