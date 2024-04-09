@@ -148,6 +148,8 @@ class MyClient(discord.Client):
 
             logger.info_voiceStatus(before, member.name + ' がボイスチャンネルを退出')
 
+    async def on_reaction_add(self, reaction, user):
+        logger.info_reaction(reaction, user, reaction.message.content)
     # @tasks.loop(seconds=1)
     # async def earthQuek(self):
     #     # 地震/津波速報
@@ -160,5 +162,7 @@ class MyClient(discord.Client):
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.reactions = True
+intents.guilds = True
 client = MyClient(intents=intents)
 client.run(token.TOKEN)
