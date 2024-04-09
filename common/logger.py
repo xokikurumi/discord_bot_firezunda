@@ -146,10 +146,13 @@ def info_reaction(reaction, user, msg):
     time = datetime.datetime.now()
     # ログファイル ヘッダー部生成
     logMsg = '[' + time.strftime('%Y/%m/%d %H:%M:%S.%f') + ']'
-    if user.nick == None:
-        logMsg += '[name:' + user.name+ '/nick: NONE/global: ' + user.global_name + ']'
+    if user.bot:
+        logMsg += '[BOT]'
     else:
-        logMsg += '[name:' + user.name+ '/nick: ' + user.nick + '/global: ' + user.global_name + ']'
+        if user.nick == None:
+            logMsg += '[name:' + user.name+ '/nick: NONE/global: ' + user.global_name + ']'
+        else:
+            logMsg += '[name:' + user.name+ '/nick: ' + user.nick + '/global: ' + user.global_name + ']'
 
     logMsg += '[' + str(reaction.message.id) + ']'
 
