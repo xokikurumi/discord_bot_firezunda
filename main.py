@@ -150,6 +150,9 @@ class MyClient(discord.Client):
 
     async def on_reaction_add(self, reaction, user):
         logger.info_reaction(reaction, user, reaction.message.content)
+
+    async def on_reaction_remove(self, reaction, user):
+        logger.info_reaction(reaction, user, reaction.message.content)
     # @tasks.loop(seconds=1)
     # async def earthQuek(self):
     #     # 地震/津波速報
@@ -163,6 +166,7 @@ class MyClient(discord.Client):
 intents = discord.Intents.default()
 intents.message_content = True
 intents.reactions = True
+intents.members = True
 intents.guilds = True
 client = MyClient(intents=intents)
 client.run(token.TOKEN)
