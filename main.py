@@ -83,7 +83,12 @@ class MyClient(discord.Client):
                     tr = Translator()
                     result = tr.translate(message.content,src='en',dest='ja').text
                     result = result.replace('：', ':')
-                    await message.channel.send(result)
+# 正規表現を使用し、絵文字を削除する
+                    result = re.sub(':[0-9a-zA-Z]:','',result)
+                    msgs = common.msgSplit(result)
+                    for msg in msgs:
+                        await message.channel.send(msg)
+                    
                     return
 
 
@@ -117,6 +122,9 @@ class MyClient(discord.Client):
         # if message.content == 'ping':
         #     await message.channel.send('pong')
         # 管理者権限系コマンド
+        # bot以外
+        if message.author.bot:
+            return
         if message.author.guild_permissions.administrator:
             if message.content == "?fireConfig help":
                 await message.channel.send('''
