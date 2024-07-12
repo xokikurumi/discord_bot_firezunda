@@ -5,7 +5,7 @@ def msgSplit(msg):
 	resultData = ""
 	for x in msgs:
 		if len(resultData + x) < 2000:
-			resultData = resultData + x
+			resultData = resultData + x + '\n'
 		else:
 			result.append(resultData)
 			resultData = x
