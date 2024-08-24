@@ -19,7 +19,7 @@ def info(event, msg):
         logMsg += '[添付ファイルあり]'
         # ダウンロード開始
         for file in event.attachments:
-            http.getFileDownload(file,event.guild.name + "\\" + event.channel.name , file.filename)
+            http.getFileDownload(file,event.guild.name + "\\" + event.channel.name , time.strftime("%H%M%S") + "_" + file.filename)
 
     else:
         logMsg += '[添付ファイルなし]'
