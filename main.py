@@ -4,7 +4,6 @@ import emoji
 # pip install emoji
 
 from discord import Intents, Client, Interaction
-from discord.app_commands import CommandTree
 from common import logger
 from common import dice
 from common import common
@@ -82,9 +81,9 @@ class MyClient(discord.Client):
                 if not(message.author.id == 1066346686127026236 or message.author.id == 986560084891041892):
                     tr = Translator()
                     result = tr.translate(message.content,src='en',dest='ja').text
-                    result = result.replace('：', ':')
-# 正規表現を使用し、絵文字を削除する
-                    result = re.sub(':[0-9a-zA-Z]:','',result)
+                    result = re.sub('[<＜][0-9a-zA-Z]+[:：][0-9a-zA-Z]*[>＞]', '', result)
+                    result = re.sub('[:：][0-9][:：]', '', result)
+                    # 正規表現を使用し、絵文字を削除する
                     msgs = common.msgSplit(result)
                     for msg in msgs:
                         await message.channel.send(msg)
