@@ -31,6 +31,12 @@ def getJSON(url):
     urlData = requests.get(url)
     return urlData.json()
 
+def getContent(url):
+    time = datetime.datetime.now()
+
+    urlData = requests.get(url)
+    return urlData.content
+
 def format(html):
     html = re.sub("<(br|BR)>","\n", html)
     html = re.sub("<(P|p)>","", html)
