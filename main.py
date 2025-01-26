@@ -68,6 +68,8 @@ class MyClient(discord.Client):
 
 
     async def on_ready(self):
+        client.earthQuek.start()
+
         print('Logged on as', self.user)
         # self.earthQuek.start()
 
