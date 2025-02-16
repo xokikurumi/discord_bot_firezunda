@@ -1,6 +1,7 @@
 import discord
 import re
 import emoji
+import time
 # pip install emoji
 import datetime
 from datetime import timedelta
@@ -13,7 +14,10 @@ from discord import Intents, Client, Interaction, EntityType, PrivacyLevel
 from common import logger
 from common import dice
 from common import common
-# from API import earthQuek
+# pip install ollama
+from common import ollama
+from common import db
+
 from discord.ext import commands
 from discord.ext import tasks
 from constants import token
@@ -68,10 +72,13 @@ class MyClient(discord.Client):
 
 
     async def on_ready(self):
-        client.earthQuek.start()
+        dt_now = datetime.datetime.now().strftime("%S")
+        print(dt_now)
+        # client.earthQuek.start()
+        client.niconicoTask.start()
 
         print('Logged on as', self.user)
-        # self.earthQuek.start()
+        print('Logged on as ' + str(self.user.id))
 
     # 通常のメッセージが送信された場合
     async def on_message(self, message):
@@ -88,6 +95,12 @@ class MyClient(discord.Client):
                 await message.channel.send(diceLog["text"])
                 return
 
+        if self.user in message.mentions:
+            # ollama.createZundamon()
+            # メンションや絵文字を削除
+            ollamaMsg = ollama.sendOllama(re.sub(r'[<@]+[:A-Za-z0-9]+[>]',"",message.content))
+            await message.reply(ollamaMsg)
+            await bot.process_commands(ollamaMsg)
         if(isLang(re.sub(r'[<@]+[:A-Za-z0-9]+[>]',"",message.content))):
             if message.author.bot:
                 # マイクラbot,v1除外
@@ -168,6 +181,83 @@ class MyClient(discord.Client):
 
             logger.info_voiceStatus(before, member.name + ' がボイスチャンネルを退出')
 
+    @tasks.loop(seconds=3600)
+    async def niconicoTask(self):
+        dt_now = datetime.datetime.now().strftime("%M%S")
+        print(dt_now)
+        # if int(dt_now) < 5 :
+        for guild_data in self.guilds:
+            print(guild_data.id)
+            query = "SELECT server_id, value FROM config WHERE `key` = 'nicoRoll' AND server_id='" + str(guild_data.id) + "';"
+
+            queryResult = db.select(query)
+
+            result = niconico.GetMaintenance()
+            # メンテナンス情報
+            for row in result:
+                # for key in row.keys():
+                msg = "@roll\n"
+                msg = msg +"# " + row["title"] + "\n"
+                msg = msg + row["body"] + "\n"
+                msg = msg + "\n\n※Ollama(AI) によって内容を要約しています。"
+                msg = msg + "\n元の記事は[こちら]("+ row["link"] +")"
+                msgs = common.msgSplit(msg)
+                # 文字数制限に気を付けつつ送信
+                for m in msgs:
+                    # await message.channel.send(m)
+                    for val in queryResult:
+                        await self.wait_until_ready()
+                        query = "SELECT server_id, value FROM config WHERE `key` = 'nicoCH' AND server_id='" + str(guild_data.id) + "';"
+                        channelResult = db.select(query)
+                        await guild_data.get_channel(int(channelResult[0][1])).send(common.msgRoll(m, 'nicoRoll', guild_data.id))
+
+
+            #誕生祭情報
+                        query = "SELECT server_id, value FROM config WHERE `key` = 'nicoRoll' AND server_id='" + str(guild_data.id) + "';"
+
+            queryResult = db.select(query)
+
+            result = niconico.GetVOICEROID()
+            # メンテナンス情報
+            for row in result:
+                # for key in row.keys():
+                msg = "@roll\n"
+                msg = msg +"# " + row["title"] + "\n"
+                msg = msg + row["body"] + "\n"
+                msg = msg + "\n\n※Ollama(AI) によって内容を要約しています。"
+                msg = msg + "\n元の記事は[こちら]("+ row["link"] +")"
+                msgs = common.msgSplit(msg)
+                print(msgs)
+                # 文字数制限に気を付けつつ送信
+                for m in msgs:
+                    # await message.channel.send(m)
+                    for val in queryResult:
+                        await self.wait_until_ready()
+                        query = "SELECT server_id, value FROM config WHERE `key` = 'vocaCH' AND server_id='" + str(guild_data.id) + "';"
+                        channelResult = db.select(query)
+                        await guild_data.get_channel(int(channelResult[0][1])).send(common.msgRoll(m, 'vocaloid', guild_data.id))
+        # 誕生祭情報
+        # result = niconico.GetVOICEROID()
+        # query = "SELECT server_id, value FROM config WHERE `key` = 'vocaloid';"
+        # queryResult = db.select(query)
+        # for row in result:
+        #     print(row)
+        #     for key in row.keys():
+        #         msg = "@roll\n"
+        #         msg = msg +"# " + row["title"] + "\n"
+        #         msg = msg + row["summary"] + "\n"
+        #         msg = msg + "\n\n※Ollama(AI) によって内容を要約しています。"
+        #         msg = msg + "\n元の記事は[こちら]("+ row["link"] +")"
+
+        #         msgs = common.msgSplit(msg)
+
+        #     # 文字数制限に気を付けつつ送信
+        #     for m in msgs:
+        #         # await message.channel.send(m)
+        #         for val in queryResult:
+        #             query = "SELECT server_id, value FROM config WHERE `key` = 'vocaCH' AND server_id='" + queryResult[0][0] + "';"
+        #             channelResult = db.select(query)
+        #             await self.get_guild(queryResult[0][0]).get_channel(channelResult[0][1]).send(common.msgRoll(m, 'vocaloid', queryResult[0][1]))
 
     @tasks.loop(seconds=1)
     async def earthQuek(self):
@@ -205,7 +295,7 @@ class MyClient(discord.Client):
                                     entity_type=EntityType.external,
                                     privacy_level=PrivacyLevel.guild_only)
                                 # 登録後の通知処理
-                                self.get_guild(int(roll[0])).get_channel(int(roll[1])).send(common.msgRoll("@roll\n" + event.name + "(" + event.begin.datetime.strftime("%Y/%m/%d") + " 開催) を登録しました。"
+                                self.get_guild(int(roll[0])).get_channel(int(roll[1])).send(common.msgRoll("@roll\n" + event.name + "(" + event.begin.datetime.strftime("%Y/%m/%d") + " 開催) を登録しました。\n" + event.description
                                     , roll[2], int(roll[0])))
 
 
@@ -279,6 +369,12 @@ class MyClient(discord.Client):
                             await self.get_guild(int(queryResult[0][0])).get_channel(int(channelResult[0][1])).send(common.msgRoll(m, 'quake', queryResult[0][0]), file=discord.File("nowQuakeImages.png"))
                         else:
                             await self.get_guild(int(queryResult[0][0])).get_channel(int(channelResult[0][1])).send(common.msgRoll(m, 'quake', queryResult[0][0]))
+                        query = "SELECT server_id, value FROM config WHERE `key` = 'quakeCH' AND server_id='" + queryResult[0][0] + "';"
+                        channelResult = db.select(query)
+                        if index == 0:
+                            await self.get_guild(int(queryResult[0][0])).get_channel(int(channelResult[0][1])).send(common.msgRoll(m, 'quake', queryResult[0][1]), file=discord.File("nowQuakeImages.png"))
+                        else:
+                            await self.get_guild(int(queryResult[0][0])).get_channel(int(channelResult[0][1])).send(common.msgRoll(m, 'quake', queryResult[0][1]))
                     index += 1
             else:
                 for msg in txt:
@@ -287,7 +383,7 @@ class MyClient(discord.Client):
                     index = 0
                     for m in msgs:
                         for val in queryResult:
-                            query = "SELECT server_id, value FROM config WHERE `key` = 'quakeCH';"
+                            query = "SELECT server_id, value FROM config WHERE `key` = 'quakeCH' AND server_id='" + queryResult[0][0] + "';"
                             channelResult = db.select(query)
                             if index == 0:
                                 await self.get_guild(int(queryResult[0][0])).get_channel(int(channelResult[0][1])).send(common.msgRoll(m, 'quake', queryResult[0][0]), file=discord.File("nowQuakeImages.png"))

@@ -1,6 +1,7 @@
 from common import db
 
 def msgSplit(msg):
+	msg = msg.replace("\r","\n")
 	msgs = msg.split("\n")
 	result = []
 	resultData = ""
@@ -15,12 +16,14 @@ def msgSplit(msg):
 	return result
 
 def msgRoll(msg,key, serverId):
-	query = "SELECT value FROM config WHERE `key` = '" + key + "' AND server_id = '+ " + str(serverId) + " +';"
+	query = "SELECT value FROM config WHERE `key` = '" + key + "' AND server_id = '" + str(serverId) + "';"
+	print(query)
 	queryResult = db.select(query)
-	if value == "@everyone":
-		return msg.replace("@roll",value[0])
+	print(queryResult)
+	if str(queryResult[0][0]) == "@everyone":
+		return msg.replace("@roll","@everyone")
 	else:
-		if roll[2] == "none":
+		if queryResult[0][0] == "none":
 			return msg.replace("@roll","")
 		else:
-			return msg.replace("@roll","<@&"+ value[0] + ">")
+			return msg.replace("@roll","<@&"+ queryResult[0][0] + ">")
