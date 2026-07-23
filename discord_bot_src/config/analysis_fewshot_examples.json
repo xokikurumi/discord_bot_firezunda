@@ -1,0 +1,74 @@
+[
+  {
+    "name": "friendly_game_banter",
+    "context": "ゲーム中の軽口。相手を否定する意図は薄い。",
+    "input": "お前またやらかしたのかよｗ",
+    "output": {
+      "aggression": 15,
+      "intimidation": 0,
+      "insult": 25,
+      "sarcasm": 10,
+      "snide": 15,
+      "discomfort": 20,
+      "targeted": true,
+      "confidence": 75,
+      "context_dependency": true,
+      "reason": "親しい軽口"
+    },
+    "note": "文脈依存が高く、これ単体では通知しない例。"
+  },
+  {
+    "name": "direct_personal_insult",
+    "context": "相手の人格や能力を直接否定している。",
+    "input": "またお前か、ほんと使えないな",
+    "output": {
+      "aggression": 62,
+      "intimidation": 10,
+      "insult": 78,
+      "sarcasm": 20,
+      "snide": 45,
+      "discomfort": 72,
+      "targeted": true,
+      "confidence": 88,
+      "context_dependency": false,
+      "reason": "人格否定"
+    },
+    "note": "明確な対人攻撃として通知候補にする例。"
+  },
+  {
+    "name": "game_complaint_not_targeted",
+    "context": "ゲームや状況への不満。特定人物への攻撃ではない。",
+    "input": "このゲームまじでクソ",
+    "output": {
+      "aggression": 20,
+      "intimidation": 0,
+      "insult": 0,
+      "sarcasm": 0,
+      "snide": 0,
+      "discomfort": 10,
+      "targeted": false,
+      "confidence": 90,
+      "context_dependency": false,
+      "reason": "状況への不満"
+    },
+    "note": "荒い言葉でも対象者がいないため通知しない例。"
+  },
+  {
+    "name": "clear_intimidation",
+    "context": "相手を怖がらせる意図が明確。",
+    "input": "次やったら絶対に許さないからな",
+    "output": {
+      "aggression": 65,
+      "intimidation": 85,
+      "insult": 20,
+      "sarcasm": 0,
+      "snide": 10,
+      "discomfort": 80,
+      "targeted": true,
+      "confidence": 90,
+      "context_dependency": false,
+      "reason": "威圧的表現"
+    },
+    "note": "高い威圧スコアとして通知候補にする例。"
+  }
+]

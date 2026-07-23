@@ -1,0 +1,41 @@
+stages:
+  - validate
+  - build
+  - deploy
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+markdown_lint:
+  stage: validate
+  image: node:20
+  script:
+    - npm install -g markdownlint-cli
+    - markdownlint --config markdownlint.json "README.md" "docs/**/*.md"
+
+mkdocs_build:
+  stage: build
+  image: python:3.11-slim
+  cache:
+    paths:
+      - .cache/pip
+  script:
+    - pip install -r requirements.txt
+    - mkdocs build --strict
+  artifacts:
+    paths:
+      - site
+
+pages:
+  stage: deploy
+  image: alpine:3.20
+  dependencies:
+    - mkdocs_build
+  script:
+    - mkdir -p public
+    - cp -r site/* public/
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
