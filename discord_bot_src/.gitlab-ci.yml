@@ -1,0 +1,96 @@
+stages:
+  - test
+  - deploy
+
+default:
+  tags:
+    - shell
+
+python_compile:
+  stage: test
+  variables:
+    PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+    DISCORD_TOKEN: "ci-placeholder"
+    DB_USER: "root"
+    DB_PASSWORD: "password"
+    DB_HOST: "localhost"
+    DB_PORT: "3306"
+    DB_NAME: "discord_bot"
+  cache:
+    paths:
+      - .cache/pip
+  before_script:
+    - |
+      set -e
+      if command -v python3 >/dev/null 2>&1; then
+        PYTHON_BIN=python3
+      elif command -v python >/dev/null 2>&1; then
+        PYTHON_BIN=python
+      elif command -v apt-get >/dev/null 2>&1; then
+        apt-get update
+        apt-get install -y python3 python3-pip python3-venv
+        PYTHON_BIN=python3
+      else
+        echo "Python is not installed. Install Python 3 on the shell runner."
+        exit 1
+      fi
+      "$PYTHON_BIN" -m venv .venv
+      . .venv/bin/activate
+      echo "Using Python: $(python --version)"
+      python -m pip install --upgrade pip
+      python -m pip install -r requirements.txt
+  script:
+    - . .venv/bin/activate
+    - python -m compileall -q .
+
+deploy_release:
+  stage: deploy
+  needs:
+    - python_compile
+  rules:
+    - if: '$CI_COMMIT_TAG'
+  script:
+    - |
+      set -e
+      if [ -z "${CI_COMMIT_TAG:-}" ]; then
+        echo "This job must run from a Git tag."
+        exit 1
+      fi
+      if [ -z "${DEPLOY_DIR:-}" ]; then
+        echo "DEPLOY_DIR is not set. Add it in GitLab Settings > CI/CD > Variables."
+        exit 1
+      fi
+      if [ -f "/.dockerenv" ]; then
+        echo "This job is running inside Docker, so DEPLOY_DIR points to the container filesystem."
+        echo "Use a Shell executor runner on the GitLab host, or mount the host deploy directory into the Docker runner."
+        exit 1
+      fi
+      case "$DEPLOY_DIR" in
+        /*) ;;
+        *)
+          echo "DEPLOY_DIR must be an absolute path: $DEPLOY_DIR"
+          exit 1
+          ;;
+      esac
+      RELEASE_DIR="$DEPLOY_DIR/$CI_COMMIT_TAG"
+      if [ ! -d "$DEPLOY_DIR" ]; then
+        echo "DEPLOY_DIR does not exist: $DEPLOY_DIR"
+        echo "Create it on the GitLab runner host and grant write permission to the gitlab-runner user."
+        exit 1
+      fi
+      if [ ! -w "$DEPLOY_DIR" ]; then
+        echo "DEPLOY_DIR is not writable by the current runner user: $DEPLOY_DIR"
+        echo "Grant write permission to the gitlab-runner user on the GitLab runner host."
+        exit 1
+      fi
+      mkdir -p "$RELEASE_DIR"
+      tar \
+        --exclude='./.git' \
+        --exclude='./.cache' \
+        --exclude='./.venv' \
+        --exclude='./__pycache__' \
+        --exclude='./cache' \
+        --exclude='./files' \
+        -cf - . | tar -xf - -C "$RELEASE_DIR"
+      printf 'Deployed %s to %s\n' "$CI_COMMIT_TAG" "$RELEASE_DIR"
+      ls -la "$RELEASE_DIR"

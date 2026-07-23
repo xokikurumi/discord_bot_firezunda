@@ -1,0 +1,23 @@
+[Unit]
+Description=DEV Discord Bot
+Documentation=file:/opt/discord/current/README.md
+After=network-online.target mariadb.service mysqld.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=discord
+Group=discord
+WorkingDirectory=/opt/discord/current
+EnvironmentFile=/etc/discord-bot/discord-bot.env
+ExecStart=/opt/discord/current/.venv/bin/python -u /opt/discord/current/main.py
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=30
+KillSignal=SIGINT
+
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

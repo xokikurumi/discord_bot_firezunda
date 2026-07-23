@@ -1,0 +1,8 @@
+aiohttp
+aiomysql
+beautifulsoup4
+d20
+discord.py
+pillow
+pymysql
+sqlalchemy
