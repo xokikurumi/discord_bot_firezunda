@@ -38,7 +38,8 @@ DB URL は環境変数 `DB_URL` があればそれを優先し、なければ us
 | message_edit_log | `guild_id`、`channel_id`、`user_id` を追加する |
 | message_delete_log | guild/channel/user/content/添付/埋め込み関連列を追加する |
 | message_analysis_log | Ollama 分析スコア、判定、raw result、prompt version、prompt hash、参照 RAG 事例を追加する |
-| message_analysis_feedback | 管理者フィードバック、review status、補正結果 JSON を追加する |
+| message_analysis_feedback | 管理者フィードバック、review status、補正結果 JSON、embedding 列を追加する |
+| message_analysis_whitelist | guild 単位の分析除外ルール列を追加する |
 | communication_trend_analysis | 半期分析結果列を追加する |
 | b_niconico_video_send_log | 投稿日、送信済み、削除フラグ、作成日時を追加する |
 | b_m_niconico_video_infomation | 削除フラグを追加する |
@@ -55,6 +56,7 @@ DB URL は環境変数 `DB_URL` があればそれを優先し、なければ us
 | `uq_ics_guild_event_import_guild_uid` | `ics_guild_event_import(guild_id, ics_uid)` |
 | `uq_niconico_info_event_source_key` | `niconico_info_event(source_key)` |
 | `uq_message_analysis_log_message_id` | `message_analysis_log(message_id)` |
+| `idx_message_analysis_feedback_embedding` | `message_analysis_feedback(embedding_model, embedding_text_hash)` |
 | `uq_discord_user_guild_user` | `discord_user(guild_id, user_id)` |
 | `uq_discord_channel_guild_channel` | `discord_channel(guild_id, channel_id)` |
 

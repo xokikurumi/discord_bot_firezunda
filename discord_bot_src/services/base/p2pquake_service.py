@@ -25,6 +25,10 @@ class P2PQuakeService:
 	TARGET_CODES = {551, 552, 556}
 	MAX_SEEN_IDS = 200
 	DISCORD_MESSAGE_LIMIT = 1900
+	MIN_DISPLAY_SCALE = 30
+	HIGH_DENSITY_INTENSITY_COUNT = 50
+	HIGH_DENSITY_MIN_DISPLAY_SCALE = 40
+	WHITE_TEXT_MIN_SCALE = 55
 	PREFECTURE_COORDS = {
 		"\u5317\u6d77\u9053": (43.06, 141.35),
 		"\u9752\u68ee\u770c": (40.82, 140.74),
@@ -666,6 +670,8 @@ class P2PQuakeService:
 		map_height = 540
 		if intensity_points is None:
 			intensity_points = self.extract_intensity_points(data)
+		intensity_min_display_scale = self.image_intensity_min_display_scale(intensity_points)
+		intensity_points = self.filter_image_intensity_points(intensity_points, intensity_min_display_scale)
 		if not location and not intensity_points:
 			return None
 		render_context = self.build_gsi_render_context(location, intensity_points, map_width, map_height)
@@ -703,7 +709,7 @@ class P2PQuakeService:
 			value_box = draw.multiline_textbbox((info_x, value_y), value, font=font_medium, spacing=4)
 			info_y += max(58, (value_box[3] - info_y) + 18)
 
-		self.draw_intensity_legend(draw, info_x, info_y + 8, font_small)
+		self.draw_intensity_legend(draw, info_x, info_y + 8, font_small, intensity_min_display_scale)
 
 		draw.text((32, height - 36), "P2P\u5730\u9707\u60c5\u5831\u306e\u9707\u6e90\u30fb\u9707\u5ea6\u30c7\u30fc\u30bf\u3092\u5143\u306b\u4f5c\u6210 / \u80cc\u666f: \u5730\u7406\u9662\u30bf\u30a4\u30eb / \u89b3\u6e2c\u70b9\u4f4d\u7f6e: \u6c17\u8c61\u5e81\u9707\u5ea6\u89b3\u6e2c\u70b9\u4e00\u89a7", font=font_small, fill=(98, 111, 121))
 		if location:
@@ -968,6 +974,25 @@ class P2PQuakeService:
 				}
 
 		return sorted(by_key.values(), key=lambda item: item["scale"], reverse=True)
+
+	def image_intensity_min_display_scale(self, points):
+		"""Return the minimum intensity shown on the generated earthquake map."""
+		displayable_count = sum(
+			1 for point in points
+			if point.get("scale") is not None and point["scale"] >= self.MIN_DISPLAY_SCALE
+		)
+		if displayable_count > self.HIGH_DENSITY_INTENSITY_COUNT:
+			return self.HIGH_DENSITY_MIN_DISPLAY_SCALE
+		return self.MIN_DISPLAY_SCALE
+
+	def filter_image_intensity_points(self, points, min_scale=None):
+		"""Filter image intensity points so low intensities do not crowd the map."""
+		min_scale = min_scale or self.image_intensity_min_display_scale(points)
+		filtered = [
+			point for point in points
+			if point.get("scale") is not None and point["scale"] >= min_scale
+		]
+		return filtered
 
 	async def extract_intensity_points_from_db(self, data: dict):
 		"""Extract intensity points and resolve missing coordinates from cached DB data."""
@@ -1363,7 +1388,12 @@ class P2PQuakeService:
 			text_box = draw.textbbox((0, 0), scale_label, font=font)
 			text_width = text_box[2] - text_box[0]
 			text_height = text_box[3] - text_box[1]
-			draw.text((x - text_width / 2, y - text_height / 2 - 1), scale_label, font=font, fill=(20, 24, 28))
+			draw.text(
+				(x - text_width / 2, y - text_height / 2 - 1),
+				scale_label,
+				font=font,
+				fill=self.intensity_label_text_color(point["scale"]),
+			)
 
 	def draw_tsunami_area_points(self, draw, points, context, left, top, font):
 		"""Draw tsunami warning area markers and short labels on the map."""
@@ -1425,16 +1455,31 @@ class P2PQuakeService:
 			stroke_fill=(255, 255, 255),
 		)
 
-	def draw_intensity_legend(self, draw, x, y, font):
+	def draw_intensity_legend(self, draw, x, y, font, min_scale=None):
 		"""Draw the intensity color legend beside the map."""
 		draw.text((x, y), "\u89b3\u6e2c\u5730\u70b9\u9707\u5ea6\u51e1\u4f8b", font=font, fill=(86, 99, 110))
-		legend_items = [10, 20, 30, 40, 45, 50, 55, 60, 70]
+		min_scale = min_scale or self.MIN_DISPLAY_SCALE
+		legend_items = [
+			scale for scale in [10, 20, 30, 40, 45, 50, 55, 60, 70]
+			if scale >= min_scale
+		]
 		for index, scale in enumerate(legend_items):
 			item_x = x + (index % 3) * 68
 			item_y = y + 28 + (index // 3) * 34
 			color = self.SCALE_COLORS.get(scale, (130, 130, 130))
 			draw.ellipse((item_x, item_y, item_x + 24, item_y + 24), fill=color, outline=(255, 255, 255), width=2)
-			draw.text((item_x + 30, item_y + 2), self.scale_text(scale), font=font, fill=(24, 35, 43))
+			draw.text(
+				(item_x + 30, item_y + 2),
+				self.scale_text(scale),
+				font=font,
+				fill=(24, 35, 43),
+			)
+
+	def intensity_label_text_color(self, scale):
+		"""Return readable text color for an intensity marker."""
+		if scale is not None and scale >= self.WHITE_TEXT_MIN_SCALE:
+			return (255, 255, 255)
+		return (20, 24, 28)
 
 	def draw_tsunami_legend(self, draw, x, y, font):
 		"""Draw the tsunami warning grade color legend beside the map."""
@@ -1533,7 +1578,7 @@ class P2PQuakeService:
 		hypocenter = earthquake.get("hypocenter") or {}
 		points = data.get("points") or []
 		lines = [
-			"\u3010\u5730\u9707\u60c5\u5831\u3011",
+			"## \U0001f30f \u5730\u9707\u901f\u5831\uff08\u5730\u9707\u60c5\u5831\uff09",
 			f"\u767a\u8868\u6642\u523b: {self.issue_time(data)}",
 			f"\u767a\u751f\u6642\u523b: {earthquake.get('time') or '-'}",
 			f"\u9707\u6e90\u5730: {hypocenter.get('name') or '-'}",
@@ -1551,7 +1596,7 @@ class P2PQuakeService:
 		"""Format code 552 tsunami forecast or warning information."""
 		areas = data.get("areas") or []
 		lines = [
-			"\u3010\u6d25\u6ce2\u4e88\u5831\u3011",
+			"## \U0001f30a \u6d25\u6ce2\u4e88\u5831",
 			f"\u767a\u8868\u6642\u523b: {self.issue_time(data)}",
 		]
 		if data.get("cancelled"):
@@ -1572,15 +1617,17 @@ class P2PQuakeService:
 		hypocenter = earthquake.get("hypocenter") or {}
 		areas = data.get("areas") or []
 		lines = [
-			"\u3010\u7dca\u6025\u5730\u9707\u901f\u5831\uff08\u8b66\u5831\uff09\u3011",
+			"## \U0001f6a8 \u7dca\u6025\u5730\u9707\u901f\u5831\uff08\u8b66\u5831\uff09",
 			f"\u767a\u8868\u6642\u523b: {self.issue_time(data)}",
 			f"\u767a\u751f\u6642\u523b: {earthquake.get('originTime') or earthquake.get('time') or '-'}",
 			f"\u9707\u6e90\u5730: {hypocenter.get('name') or '-'}",
 			f"\u898f\u6a21: M{hypocenter.get('magnitude') or '-'} / \u6df1\u3055: {self.depth_text(hypocenter.get('depth'))}",
 			f"\u6700\u5927\u4e88\u6e2c\u9707\u5ea6: {self.scale_text(earthquake.get('maxScale'))}",
 		]
-		for area in areas:
-			lines.append(f"- {area.get('name') or area.get('pref') or '-'}: {self.scale_text(area.get('scaleFrom') or area.get('scale'))}")
+		intensity_lines = self.format_points(areas)
+		if intensity_lines:
+			lines.append("\u4e88\u6e2c\u9707\u5ea6:")
+			lines.extend(intensity_lines)
 		return "\n".join(lines)
 
 	def issue_time(self, data: dict):
@@ -1598,6 +1645,8 @@ class P2PQuakeService:
 		)
 		for point in sorted_points:
 			scale = self.extract_point_max_scale(point)
+			if scale is None or scale < self.MIN_DISPLAY_SCALE:
+				continue
 			name = point.get("addr") or point.get("name") or point.get("pref") or "-"
 			lines.append(f"- {name}: {self.scale_text(scale)}")
 		return lines

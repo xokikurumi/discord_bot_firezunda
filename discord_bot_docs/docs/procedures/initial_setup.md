@@ -32,6 +32,7 @@ id discord
 
 ```bash
 sudo mkdir -p /opt/discord/releases
+sudo mkdir -p /opt/discord/config
 sudo mkdir -p /etc/discord-bot
 sudo chown -R discord-bot:discord-bot /opt/discord
 sudo chmod 755 /opt/discord
@@ -107,6 +108,32 @@ sudo -u discord-bot .venv/bin/python -m pip check
 ```
 
 ## 8. 起動確認を行う
+
+解析機能で長い system prompt や固定 few-shot を利用する場合は、起動前に設定ファイルを配置します。
+環境変数へ長文を直接書かず、ファイル path を指定します。
+
+```bash
+sudo install -o discord-bot -g discord-bot -m 640 \
+  config/analysis_system_prompt.md \
+  /opt/discord/config/analysis_system_prompt.md
+sudo install -o discord-bot -g discord-bot -m 640 \
+  config/analysis_fewshot_examples.json \
+  /opt/discord/config/analysis_fewshot_examples.json
+```
+
+環境変数ファイルには次を設定します。
+
+```env
+OLLAMA_ANALYSIS_SYSTEM_PROMPT_PATH=/opt/discord/config/analysis_system_prompt.md
+OLLAMA_ANALYSIS_FEWSHOT_PATH=/opt/discord/config/analysis_fewshot_examples.json
+```
+
+feedback embedding RAG を利用する場合は、Ollama 側に embedding model を用意し、サービス起動後に既存フィードバックをバックフィルします。
+
+```env
+OLLAMA_ANALYSIS_FEEDBACK_EMBEDDING_RAG_ENABLED=true
+OLLAMA_EMBEDDING_MODEL=nomic-embed-text:latest
+```
 
 ```bash
 sudo systemctl enable discord-bot

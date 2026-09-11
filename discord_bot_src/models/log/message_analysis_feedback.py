@@ -18,9 +18,14 @@ class MessageAnalysisFeedback(Base, TimestampMixin, TablenameMixin):
 	review_status = Column(String(30), nullable=False, default="CONFIRMED")
 	corrected_result_json = Column(Text, nullable=True)
 	note = Column(Text, nullable=True)
+	embedding_model = Column(String(100), nullable=True)
+	embedding_text_hash = Column(String(64), nullable=True)
+	embedding_dim = Column(Integer, nullable=True)
+	embedding_json = Column(Text, nullable=True)
 
 	__table_args__ = (
 		Index("idx_message_analysis_feedback_message_created", "message_id", "created_at"),
 		Index("idx_message_analysis_feedback_label_created", "label", "created_at"),
 		Index("idx_message_analysis_feedback_status_created", "review_status", "created_at"),
+		Index("idx_message_analysis_feedback_embedding", "embedding_model", "embedding_text_hash"),
 	)

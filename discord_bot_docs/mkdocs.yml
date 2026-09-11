@@ -1,10 +1,11 @@
-site_name: discord_bot_docs
-site_description: Discord bot project documentation
+site_name: discord_bot ドキュメント
+site_description: Discord bot プロジェクト設計・運用ドキュメント
 
 use_directory_urls: true
 
 theme:
   name: material
+  language: ja
   features: []
 
 markdown_extensions:
@@ -26,117 +27,124 @@ plugins:
   - search
 
 nav:
-  - Home: index.md
-  - Requirements:
-      - Overview: requirements/README.md
-      - Common:
-          - System: requirements/common/system.md
-          - Non Functional: requirements/common/non_functional.md
-          - Data: requirements/common/data.md
-          - Operations: requirements/common/operations.md
-          - Constraints: requirements/common/constraints.md
-      - Features:
-          - Message Logging: requirements/features/message_logging.md
-          - Voice Logging: requirements/features/voice_logging.md
-          - Reaction Automation: requirements/features/reaction_automation.md
-          - Dice Roll: requirements/features/dice_roll.md
-          - Notification Config: requirements/features/notification_config.md
-          - P2PQuake Notification: requirements/features/p2pquake_notification.md
-          - Geolonia Address Sync: requirements/features/geolonia_address_sync.md
-          - ICS Guild Event: requirements/features/ics_guild_event.md
-          - Niconico User Video: requirements/features/niconico_user_video.md
-          - Niconico Info: requirements/features/niconico_info.md
-          - Ollama Message Analysis: requirements/features/ollama_message_analysis.md
-          - Communication Trend: requirements/features/communication_trend.md
-          - Command Interface: requirements/features/command_interface.md
-      - Geolonia Startup Sync Legacy Link: requirements/geolonia_startup_sync.md
-  - Command Lists:
-      - Reaction Commands from v2: requirements/reaction_command_list_from_v2.md
-      - Current Commands from Source: requirements/command_list_from_src.md
-  - Batch Definitions:
-      - Overview: batch_definitions/README.md
-      - Database Startup Migration: batch_definitions/batches/database_startup_migration.md
-      - P2PQuake WebSocket Watch: batch_definitions/batches/p2pquake_websocket_watch.md
-      - JMA Shindo Station Sync: batch_definitions/batches/jma_shindo_station_sync.md
-      - ICS Guild Event Import: batch_definitions/batches/ics_guild_event_import.md
-      - Communication Trend Analysis: batch_definitions/batches/communication_trend_analysis.md
-      - Niconico Info Check: batch_definitions/batches/niconico_info_check.md
-      - Niconico User Video Check: batch_definitions/batches/niconico_user_video_check.md
-      - Ollama Message Analysis: batch_definitions/batches/ollama_message_analysis.md
-      - GSI Tile Cache: batch_definitions/batches/gsi_tile_cache.md
-      - Release Switch: batch_definitions/batches/release_switch.md
-      - DB Table Definition Generation: batch_definitions/batches/db_table_definition_generation.md
-      - DB Init Script: batch_definitions/batches/db_init_script.md
-      - Geolonia Address Sync: batch_definitions/batches/geolonia_address_sync.md
-  - Procedures:
-      - Overview: procedures/README.md
-      - Initial Setup: procedures/initial_setup.md
-      - Release: procedures/release.md
-      - Service Operation: procedures/service_operation.md
-      - Rollback: procedures/rollback.md
-      - Maintenance: procedures/maintenance.md
-  - Basic Design:
-      - Overview: basic_design/README.md
-      - Common:
-          - System Architecture: basic_design/common/system_architecture.md
-          - Startup: basic_design/common/startup.md
-          - Security: basic_design/common/security.md
-          - Operations: basic_design/common/operations.md
-          - External Integrations: basic_design/common/external_integrations.md
-          - Error Handling: basic_design/common/error_handling.md
-          - Data Design: basic_design/common/data_design.md
-      - Features:
-          - Niconico User Video: basic_design/features/niconico_user_video.md
-          - Niconico Info: basic_design/features/niconico_info.md
-          - Message Logging: basic_design/features/message_logging.md
-          - ICS Guild Event: basic_design/features/ics_guild_event.md
-          - Dice Roll: basic_design/features/dice_roll.md
-          - Communication Trend: basic_design/features/communication_trend.md
-          - P2PQuake Notification: basic_design/features/p2pquake_notification.md
-          - Geolonia Address Sync: basic_design/features/geolonia_address_sync.md
-          - Ollama Message Analysis: basic_design/features/ollama_message_analysis.md
-          - Notification Config: basic_design/features/notification_config.md
-          - Reaction Automation: basic_design/features/reaction_automation.md
-          - Voice Logging: basic_design/features/voice_logging.md
-  - Detailed Design:
-      - Overview: detailed_design/README.md
-      - Common:
-          - Startup and Container: detailed_design/common/startup_and_container.md
-          - Database Initialization: detailed_design/common/database_initialization.md
+  - ホーム: index.md
+  - 要件定義:
+      - 概要: requirements/README.md
+      - 共通:
+          - システム: requirements/common/system.md
+          - 非機能: requirements/common/non_functional.md
+          - データ: requirements/common/data.md
+          - 運用: requirements/common/operations.md
+          - 制約: requirements/common/constraints.md
+      - 機能:
+          - メッセージログ: requirements/features/message_logging.md
+          - ボイスログ: requirements/features/voice_logging.md
+          - リアクション自動化: requirements/features/reaction_automation.md
+          - ダイスロール: requirements/features/dice_roll.md
+          - リアクション抽選: requirements/features/reaction_lottery.md
+          - 通知先設定: requirements/features/notification_config.md
+          - P2PQuake 通知: requirements/features/p2pquake_notification.md
+          - Geolonia 住所同期: requirements/features/geolonia_address_sync.md
+          - ICS 予定イベント: requirements/features/ics_guild_event.md
+          - Niconico ユーザー投稿動画通知: requirements/features/niconico_user_video.md
+          - Niconico Info 通知: requirements/features/niconico_info.md
+          - Ollama メッセージ分析: requirements/features/ollama_message_analysis.md
+          - コミュニケーション傾向分析: requirements/features/communication_trend.md
+          - コマンドインターフェース: requirements/features/command_interface.md
+      - Geolonia 起動時同期 旧リンク: requirements/geolonia_startup_sync.md
+  - コマンド一覧:
+      - v2 リアクションコマンド一覧: requirements/reaction_command_list_from_v2.md
+      - 最新実装コマンド一覧: requirements/command_list_from_src.md
+  - バッチ定義:
+      - 概要: batch_definitions/README.md
+      - DB 起動時マイグレーション: batch_definitions/batches/database_startup_migration.md
+      - P2PQuake WebSocket 監視: batch_definitions/batches/p2pquake_websocket_watch.md
+      - 気象庁震度観測点同期: batch_definitions/batches/jma_shindo_station_sync.md
+      - ICS 予定イベント取り込み: batch_definitions/batches/ics_guild_event_import.md
+      - コミュニケーション傾向分析: batch_definitions/batches/communication_trend_analysis.md
+      - Niconico Info 確認: batch_definitions/batches/niconico_info_check.md
+      - Niconico ユーザー投稿動画確認: batch_definitions/batches/niconico_user_video_check.md
+      - Ollama メッセージ分析: batch_definitions/batches/ollama_message_analysis.md
+      - GSI タイルキャッシュ: batch_definitions/batches/gsi_tile_cache.md
+      - リリース切替: batch_definitions/batches/release_switch.md
+      - DB テーブル定義生成: batch_definitions/batches/db_table_definition_generation.md
+      - DB 初期化スクリプト: batch_definitions/batches/db_init_script.md
+      - Geolonia 住所同期: batch_definitions/batches/geolonia_address_sync.md
+  - 手順:
+      - 概要: procedures/README.md
+      - 初期セットアップ: procedures/initial_setup.md
+      - リリース: procedures/release.md
+      - サービス運用: procedures/service_operation.md
+      - ロールバック: procedures/rollback.md
+      - メンテナンス: procedures/maintenance.md
+  - 基本設計:
+      - 概要: basic_design/README.md
+      - 共通:
+          - システム構成: basic_design/common/system_architecture.md
+          - 現行ソースコード構成: basic_design/common/source_code_structure.md
+          - 起動処理: basic_design/common/startup.md
+          - セキュリティ: basic_design/common/security.md
+          - 運用: basic_design/common/operations.md
+          - 外部連携: basic_design/common/external_integrations.md
+          - エラーハンドリング: basic_design/common/error_handling.md
+          - データ設計: basic_design/common/data_design.md
+      - 機能:
+          - Niconico ユーザー投稿動画通知: basic_design/features/niconico_user_video.md
+          - Niconico Info 通知: basic_design/features/niconico_info.md
+          - メッセージログ: basic_design/features/message_logging.md
+          - ICS 予定イベント: basic_design/features/ics_guild_event.md
+          - ダイスロール: basic_design/features/dice_roll.md
+          - リアクション抽選: basic_design/features/reaction_lottery.md
+          - コミュニケーション傾向分析: basic_design/features/communication_trend.md
+          - P2PQuake 通知: basic_design/features/p2pquake_notification.md
+          - Geolonia 住所同期: basic_design/features/geolonia_address_sync.md
+          - Ollama メッセージ分析: basic_design/features/ollama_message_analysis.md
+          - 通知先設定: basic_design/features/notification_config.md
+          - リアクション自動化: basic_design/features/reaction_automation.md
+          - ボイスログ: basic_design/features/voice_logging.md
+  - 詳細設計:
+      - 概要: detailed_design/README.md
+      - 共通:
+          - 起動とコンテナ: detailed_design/common/startup_and_container.md
+          - DB 初期化: detailed_design/common/database_initialization.md
           - CI/CD: detailed_design/common/cicd.md
-      - Features:
-          - Voice Logging: detailed_design/features/voice_logging.md
-          - Reaction Automation: detailed_design/features/reaction_automation.md
-          - P2PQuake Notification: detailed_design/features/p2pquake_notification.md
-          - Geolonia Address Sync: detailed_design/features/geolonia_address_sync.md
-          - Ollama Message Analysis: detailed_design/features/ollama_message_analysis.md
-          - Notification Config: detailed_design/features/notification_config.md
-          - Niconico User Video: detailed_design/features/niconico_user_video.md
-          - Niconico Info: detailed_design/features/niconico_info.md
-          - Message Logging: detailed_design/features/message_logging.md
-          - ICS Guild Event: detailed_design/features/ics_guild_event.md
-          - Dice Roll: detailed_design/features/dice_roll.md
-          - Communication Trend: detailed_design/features/communication_trend.md
-  - Table Definitions:
-      - Overview: table_definitions/README.md
-      - Tables:
-          - Communication Trend Analysis: table_definitions/tables/communication_trend_analysis.md
-          - Reaction Keywords: table_definitions/tables/b_reaction_keywords.md
-          - Notify Channel Config: table_definitions/tables/b_notify_cannel_config.md
-          - Niconico Video Send Log: table_definitions/tables/b_niconico_video_send_log.md
-          - Niconico Notify Channel Config: table_definitions/tables/b_niconico_notify_cannel_config.md
-          - Niconico Video Information: table_definitions/tables/b_m_niconico_video_infomation.md
-          - JMA Sync State: table_definitions/tables/b_jma_sync_state.md
-          - JMA Shindo Station: table_definitions/tables/b_jma_shindo_station.md
-          - Geolonia Sync State: table_definitions/tables/b_geolonia_sync_state.md
-          - Geolonia Address: table_definitions/tables/b_geolonia_address.md
-          - Message Edit Log: table_definitions/tables/message_edit_log.md
-          - Message Delete Log: table_definitions/tables/message_delete_log.md
-          - Message Analysis Log: table_definitions/tables/message_analysis_log.md
-          - Message Analysis Feedback: table_definitions/tables/message_analysis_feedback.md
-          - ICS Guild Event Import: table_definitions/tables/ics_guild_event_import.md
-          - ICS Guild Event Config: table_definitions/tables/ics_guild_event_config.md
-          - Niconico Info Event: table_definitions/tables/niconico_info_event.md
-          - Message Log: table_definitions/tables/message_log.md
-          - Niconico Info Filter: table_definitions/tables/niconico_info_filter.md
-          - Voice Status Log: table_definitions/tables/voice_status_log.md
+      - 機能:
+          - ボイスログ: detailed_design/features/voice_logging.md
+          - リアクション自動化: detailed_design/features/reaction_automation.md
+          - P2PQuake 通知: detailed_design/features/p2pquake_notification.md
+          - Geolonia 住所同期: detailed_design/features/geolonia_address_sync.md
+          - Ollama メッセージ分析: detailed_design/features/ollama_message_analysis.md
+          - 通知先設定: detailed_design/features/notification_config.md
+          - Niconico ユーザー投稿動画通知: detailed_design/features/niconico_user_video.md
+          - Niconico Info 通知: detailed_design/features/niconico_info.md
+          - メッセージログ: detailed_design/features/message_logging.md
+          - ICS 予定イベント: detailed_design/features/ics_guild_event.md
+          - ダイスロール: detailed_design/features/dice_roll.md
+          - リアクション抽選: detailed_design/features/reaction_lottery.md
+          - コミュニケーション傾向分析: detailed_design/features/communication_trend.md
+  - テーブル定義:
+      - 概要: table_definitions/README.md
+      - テーブル:
+          - コミュニケーション傾向分析: table_definitions/tables/communication_trend_analysis.md
+          - リアクションキーワード: table_definitions/tables/b_reaction_keywords.md
+          - 通知チャンネル設定: table_definitions/tables/b_notify_cannel_config.md
+          - Niconico 動画送信ログ: table_definitions/tables/b_niconico_video_send_log.md
+          - Niconico 通知チャンネル設定: table_definitions/tables/b_niconico_notify_cannel_config.md
+          - Niconico 動画情報: table_definitions/tables/b_m_niconico_video_infomation.md
+          - 気象庁同期状態: table_definitions/tables/b_jma_sync_state.md
+          - 気象庁震度観測点: table_definitions/tables/b_jma_shindo_station.md
+          - Geolonia 同期状態: table_definitions/tables/b_geolonia_sync_state.md
+          - Geolonia 住所: table_definitions/tables/b_geolonia_address.md
+          - メッセージ編集ログ: table_definitions/tables/message_edit_log.md
+          - メッセージ削除ログ: table_definitions/tables/message_delete_log.md
+          - メッセージ分析ログ: table_definitions/tables/message_analysis_log.md
+          - メッセージ分析フィードバック: table_definitions/tables/message_analysis_feedback.md
+          - メッセージ分析ホワイトリスト: table_definitions/tables/message_analysis_whitelist.md
+          - ICS 予定イベント取り込み: table_definitions/tables/ics_guild_event_import.md
+          - ICS 予定イベント設定: table_definitions/tables/ics_guild_event_config.md
+          - Niconico Info イベント: table_definitions/tables/niconico_info_event.md
+          - メッセージログ: table_definitions/tables/message_log.md
+          - Discord ユーザー: table_definitions/tables/discord_user.md
+          - Discord チャンネル: table_definitions/tables/discord_channel.md
+          - Niconico Info フィルター: table_definitions/tables/niconico_info_filter.md
+          - ボイス状態ログ: table_definitions/tables/voice_status_log.md

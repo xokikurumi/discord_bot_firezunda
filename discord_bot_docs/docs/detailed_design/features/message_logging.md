@@ -54,11 +54,13 @@
 
 投稿者から guild/user の識別子、表示名、Bot 判定、avatar URL、最終確認日時を作成する。
 avatar は `display_avatar` を優先し、なければ `avatar` を使用する。
+`guild_id` と `user_id` の組み合わせを一意キーとし、既存行がある場合は表示名、Bot 判定、avatar URL、最終確認日時を更新する。
 
 ## 7. チャンネルマスタ upsert
 
 チャンネルから guild/channel の識別子、名前、種別、カテゴリ、親 channel、表示順、最終確認日時を作成する。
 parent がない場合 `parent_channel_id` は null とする。
+`guild_id` と `channel_id` の組み合わせを一意キーとし、既存行がある場合は名前、種別、階層、表示順、最終確認日時を更新する。
 
 ## 8. 履歴取り込み
 

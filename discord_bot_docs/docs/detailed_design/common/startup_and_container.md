@@ -39,6 +39,7 @@ DB 初期化では engine の begin ブロックを開き、ORM metadata の `cr
 | `create_message_reaction_service` | MessageReactionService | session factory、bot |
 | `create_message_watcher_service` | MessageWatcherService | session factory、bot |
 | `create_dice_roll_service` | DiceRollService | なし |
+| `create_reaction_lottery_service` | ReactionLotteryService | なし |
 | `create_p2pquake_service` | P2PQuakeService | bot、session factory |
 | `create_ics_guild_event_service` | IcsGuildEventService | bot、session factory |
 | `create_communication_trend_service` | CommunicationTrendService | bot、session factory |
@@ -57,11 +58,12 @@ Service を先にすべて生成し、次の順序で Cog を登録する。
 | 4 | MessageWatcherCog | Ollama 投稿分析 |
 | 5 | AnalysisCog | 分析フィードバック管理 |
 | 6 | DiceRollCog | ダイスロール |
-| 7 | P2PQuakeCog | 災害通知 |
-| 8 | IcsGuildEventCog | ICS 予定イベント取り込み |
-| 9 | CommunicationTrendCog | 半期コミュニケーション分析 |
-| 10 | NiconicoUserVideoCog | Niconico 投稿通知 |
-| 11 | NiconicoInfoCog | Niconico Info 通知 |
+| 7 | ReactionLotteryCog | リアクション抽選 |
+| 8 | P2PQuakeCog | 災害通知 |
+| 9 | IcsGuildEventCog | ICS 予定イベント取り込み |
+| 10 | CommunicationTrendCog | 半期コミュニケーション分析 |
+| 11 | NiconicoUserVideoCog | Niconico 投稿通知 |
+| 12 | NiconicoInfoCog | Niconico Info 通知 |
 
 ## 8. slash command 同期
 

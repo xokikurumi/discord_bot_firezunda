@@ -45,11 +45,17 @@ DEFAULT_OLLAMA_ANALYSIS_SYSTEM_PROMPT = (
 	"You are a Japanese chat moderation assistant. "
 	"Use previous chat messages only to understand the context, meaning, target, tone, "
 	"and whether the latest message is likely joking or serious. "
+	"If linked page context is provided, use it only to understand what the latest message refers to. "
+	"Do not treat linked page text as words directly spoken by the message author. "
+	"Do not assign high scores merely because a linked page contains harmful, violent, legal, or unpleasant content. "
 	"Score only the latest target message. Do not add points for harmful wording that appears only in previous messages. "
 	"Be lenient and avoid over-detection. "
 	"If the message is ordinary conversation, casual banter, friendly joking, unclear, context-dependent, "
 	"or has no identifiable target, assign low scores. "
 	"Do not assign high scores only because of rough wording, slang, profanity, short replies, internet expressions, or fragments. "
+	"Sexual or lewd conversation, adult-topic jokes, vulgar sexual wording, or consensual adult banter are outside this interpersonal moderation scope by themselves. "
+	"Do not assign high scores merely because the topic is sexual, explicit, embarrassing, or vulgar. "
+	"Score sexual content higher only when the latest message clearly targets a real participant with sexual harassment, unwanted sexual comments, coercion, pressure, threats, degradation, or sexual/private-information abuse. "
 	"Do not automatically treat \"笑\", \"w\", emojis, or polite wording as harmless. "
 	"Consider both likely intent and likely impact on the recipient. "
 	"Previous messages may not contain all context because some conversation may have occurred in voice chat. "
@@ -98,6 +104,8 @@ DEFAULT_OLLAMA_ANALYSIS_SYSTEM_PROMPT = (
 DEFAULT_OLLAMA_ANALYSIS_USER_PROMPT_TEMPLATE = (
 	"Previous chat context, oldest to newest:\n"
 	"{context_text}\n\n"
+	"Linked page context, if safely fetched:\n"
+	"{url_context_text}\n\n"
 	"Latest target message to score:\n"
 	"{target_content}"
 )
@@ -134,7 +142,7 @@ OLLAMA_TIMEOUT_SECONDS = get_int("OLLAMA_TIMEOUT_SECONDS", 120)
 OLLAMA_MAX_CONCURRENCY = get_int("OLLAMA_MAX_CONCURRENCY", 1)
 OLLAMA_CONTEXT_MAX_CHARS = get_int("OLLAMA_CONTEXT_MAX_CHARS", 1200)
 OLLAMA_MESSAGE_MAX_CHARS = get_int("OLLAMA_MESSAGE_MAX_CHARS", 1000)
-OLLAMA_NUM_PREDICT = get_int("OLLAMA_NUM_PREDICT", 512)
+OLLAMA_NUM_PREDICT = get_int("OLLAMA_NUM_PREDICT", 1024)
 OLLAMA_RETRY_CONTEXT_MAX_CHARS = get_int("OLLAMA_RETRY_CONTEXT_MAX_CHARS", 500)
 OLLAMA_ANALYSIS_SYSTEM_PROMPT_PATH = os.getenv(
 	"OLLAMA_ANALYSIS_SYSTEM_PROMPT_PATH",
@@ -159,9 +167,24 @@ OLLAMA_ANALYSIS_FEWSHOT_PATH = os.getenv(
 OLLAMA_ANALYSIS_FEWSHOT_MAX_EXAMPLES = get_int("OLLAMA_ANALYSIS_FEWSHOT_MAX_EXAMPLES", 5)
 OLLAMA_ANALYSIS_FEEDBACK_RAG_ENABLED = get_bool("OLLAMA_ANALYSIS_FEEDBACK_RAG_ENABLED", True)
 OLLAMA_ANALYSIS_FEEDBACK_RAG_CANDIDATE_LIMIT = get_int("OLLAMA_ANALYSIS_FEEDBACK_RAG_CANDIDATE_LIMIT", 50)
+OLLAMA_ANALYSIS_FEEDBACK_RAG_SEARCH_POOL_LIMIT = get_int("OLLAMA_ANALYSIS_FEEDBACK_RAG_SEARCH_POOL_LIMIT", 2000)
 OLLAMA_ANALYSIS_FEEDBACK_RAG_MAX_EXAMPLES = get_int("OLLAMA_ANALYSIS_FEEDBACK_RAG_MAX_EXAMPLES", 3)
 OLLAMA_ANALYSIS_FEEDBACK_RAG_MIN_SIMILARITY = get_int("OLLAMA_ANALYSIS_FEEDBACK_RAG_MIN_SIMILARITY", 25)
+OLLAMA_ANALYSIS_FEEDBACK_EMBEDDING_RAG_ENABLED = get_bool("OLLAMA_ANALYSIS_FEEDBACK_EMBEDDING_RAG_ENABLED", False)
+OLLAMA_ANALYSIS_FEEDBACK_EMBEDDING_MIN_SIMILARITY = get_int("OLLAMA_ANALYSIS_FEEDBACK_EMBEDDING_MIN_SIMILARITY", 60)
+OLLAMA_EMBEDDING_URL = os.getenv(
+	"OLLAMA_EMBEDDING_URL",
+	OLLAMA_URL.replace("/api/chat", "/api/embed"),
+)
+OLLAMA_EMBEDDING_MODEL = os.getenv("OLLAMA_EMBEDDING_MODEL", "nomic-embed-text:latest")
+OLLAMA_EMBEDDING_TIMEOUT_SECONDS = get_int("OLLAMA_EMBEDDING_TIMEOUT_SECONDS", 60)
 OLLAMA_ANALYSIS_PROMPT_VERSION = os.getenv("OLLAMA_ANALYSIS_PROMPT_VERSION", "analysis-feedback-rag-v1")
+OLLAMA_ANALYSIS_URL_CONTEXT_ENABLED = get_bool("OLLAMA_ANALYSIS_URL_CONTEXT_ENABLED", True)
+OLLAMA_ANALYSIS_URL_CONTEXT_MAX_CONCURRENCY = get_int("OLLAMA_ANALYSIS_URL_CONTEXT_MAX_CONCURRENCY", 1)
+OLLAMA_ANALYSIS_URL_CONTEXT_MAX_URLS = get_int("OLLAMA_ANALYSIS_URL_CONTEXT_MAX_URLS", 2)
+OLLAMA_ANALYSIS_URL_CONTEXT_TIMEOUT_SECONDS = get_int("OLLAMA_ANALYSIS_URL_CONTEXT_TIMEOUT_SECONDS", 5)
+OLLAMA_ANALYSIS_URL_CONTEXT_MAX_BYTES = get_int("OLLAMA_ANALYSIS_URL_CONTEXT_MAX_BYTES", 200000)
+OLLAMA_ANALYSIS_URL_CONTEXT_MAX_CHARS = get_int("OLLAMA_ANALYSIS_URL_CONTEXT_MAX_CHARS", 2000)
 
 COMMUNICATION_TREND_ANALYSIS_ENABLED = get_bool("COMMUNICATION_TREND_ANALYSIS_ENABLED", True)
 COMMUNICATION_TREND_GUILD_ANALYSIS_ENABLED = get_bool("COMMUNICATION_TREND_GUILD_ANALYSIS_ENABLED", False)

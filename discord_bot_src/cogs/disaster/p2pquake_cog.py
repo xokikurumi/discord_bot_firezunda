@@ -95,14 +95,17 @@ class P2PQuakeCog(commands.Cog):
 	async def notify_config_add(
 		self,
 		ctx,
-		channel: discord.TextChannel = None,
+		channel: str = "",
 		mention: str = "",
 		category: str = constants.CONFIG_MENTION_QUAKE,
 	):
 		"""Register a notification channel setting for the current guild."""
-		target_channel = channel or ctx.channel
-		mention = "" if mention.lower() in ("none", "\u306a\u3057", "no") else mention
-		category = category.upper()
+		target_channel, mention, category = self.parse_notify_config_add_args(
+			ctx,
+			channel,
+			mention,
+			category,
+		)
 
 		await self.service.add_notify_config(
 			ctx.guild.id,
@@ -115,6 +118,53 @@ class P2PQuakeCog(commands.Cog):
 			f"notify config added: category={category}, "
 			f"channel={target_channel.mention}, mention={mention or '-'}"
 		)
+
+	def parse_notify_config_add_args(self, ctx, channel_text: str = "", mention: str = "", category: str = ""):
+		"""Parse notify_config add arguments for both prefix and slash command usage."""
+		category_values = {name for name, _description in constants.NOTIFY_CONFIG_CATEGORIES}
+		tokens = [str(value or "").strip() for value in (channel_text, mention, category) if str(value or "").strip()]
+		target_channel = ctx.channel
+		mention_text = ""
+		category_text = constants.CONFIG_MENTION_QUAKE
+
+		if tokens:
+			channel_candidate = self.resolve_text_channel(ctx, tokens[0])
+			if channel_candidate:
+				target_channel = channel_candidate
+				tokens = tokens[1:]
+
+		for token in tokens:
+			normalized = token.upper()
+			if normalized in category_values:
+				category_text = normalized
+			elif token.lower() not in ("none", "\u306a\u3057", "no"):
+				mention_text = token
+
+		return target_channel, mention_text, category_text
+
+	def resolve_text_channel(self, ctx, text: str):
+		"""Resolve a text channel from a mention, id, name, or converter result."""
+		if isinstance(text, discord.TextChannel):
+			return text
+		value = str(text or "").strip()
+		if not value:
+			return None
+
+		channel_id = None
+		if value.startswith("<#") and value.endswith(">"):
+			channel_id_text = value[2:-1]
+			if channel_id_text.isdecimal():
+				channel_id = int(channel_id_text)
+		elif value.isdecimal():
+			channel_id = int(value)
+
+		if channel_id:
+			channel = ctx.guild.get_channel(channel_id)
+			if isinstance(channel, discord.TextChannel):
+				return channel
+
+		value = value.lstrip("#")
+		return discord.utils.get(ctx.guild.text_channels, name=value)
 
 	@notify_config.command(name="list")
 	@commands.guild_only()

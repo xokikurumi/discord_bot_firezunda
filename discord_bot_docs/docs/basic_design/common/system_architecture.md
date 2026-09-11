@@ -39,6 +39,7 @@ flowchart LR
 | ボイス状態ログ | `VoiceCog` | `VoiceChannelStatusService` | `voice_status_log` |
 | リアクション自動化 | `MessageReactionCog` | `MessageReactionService` | `b_reaction_keywords` |
 | ダイスロール | `DiceRollCog` | `DiceRollService` | なし |
+| リアクション抽選 | `ReactionLotteryCog` | `ReactionLotteryService` | なし |
 | Ollama メッセージ分析 | `MessageWatcherCog` | `MessageWatcherService` | `message_analysis_log` |
 | P2PQuake 通知 | `P2PQuakeCog` | `P2PQuakeService` | `b_notify_cannel_config`, `b_jma_shindo_station`, `b_geolonia_address` |
 | ICS 予定イベント | `IcsGuildEventCog` | `IcsGuildEventService` | `ics_guild_event_config`, `ics_guild_event_import` |

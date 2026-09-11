@@ -11,8 +11,9 @@ Examples:
   sudo ./deploy/scripts/release.sh v1.0.1 D_discord_dev discord
 
 Environment variables:
-  APP_ROOT     Default: /opt/discord
-  PYTHON_BIN   Default: python3
+  APP_ROOT                 Default: /opt/discord
+  PYTHON_BIN               Default: python3
+  GSI_TILE_CACHE_ENABLED   Default: true
 USAGE
 }
 
@@ -26,6 +27,7 @@ SERVICE_NAME="${2:-discord-bot}"
 APP_USER="${3:-discord-bot}"
 APP_ROOT="${APP_ROOT:-/opt/discord}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
+GSI_TILE_CACHE_ENABLED="${GSI_TILE_CACHE_ENABLED:-true}"
 
 if [ -z "$TAG" ]; then
 	usage
@@ -93,6 +95,18 @@ fi
 sudo -u "$APP_USER" .venv/bin/python -m pip install --upgrade pip
 sudo -u "$APP_USER" .venv/bin/python -m pip install -r requirements.txt
 sudo -u "$APP_USER" .venv/bin/python -m pip check
+
+if [ "$GSI_TILE_CACHE_ENABLED" = "true" ]; then
+	if [ ! -f "deploy/scripts/cache_gsi_tiles.py" ]; then
+		echo "cache_gsi_tiles.py does not exist in current release." >&2
+		exit 1
+	fi
+
+	echo "Pre-caching GSI tiles."
+	sudo -u "$APP_USER" .venv/bin/python deploy/scripts/cache_gsi_tiles.py
+else
+	echo "Skipping GSI tile cache because GSI_TILE_CACHE_ENABLED=${GSI_TILE_CACHE_ENABLED}."
+fi
 
 echo "Restarting ${SERVICE_NAME}.service."
 systemctl restart "${SERVICE_NAME}.service"

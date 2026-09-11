@@ -111,6 +111,23 @@ async def run_schema_migrations(conn):
 			"review_status": "VARCHAR(30) NOT NULL DEFAULT 'CONFIRMED'",
 			"corrected_result_json": "TEXT NULL",
 			"note": "TEXT NULL",
+			"embedding_model": "VARCHAR(100) NULL",
+			"embedding_text_hash": "VARCHAR(64) NULL",
+			"embedding_dim": "INT NULL",
+			"embedding_json": "TEXT NULL",
+			"created_at": "DATETIME DEFAULT CURRENT_TIMESTAMP",
+		},
+	)
+	await _add_missing_columns(
+		conn,
+		"message_analysis_whitelist",
+		{
+			"guild_id": "BIGINT NOT NULL",
+			"rule_type": "VARCHAR(30) NOT NULL",
+			"pattern": "TEXT NOT NULL",
+			"created_by": "BIGINT NOT NULL",
+			"note": "TEXT NULL",
+			"enabled": "BOOLEAN NOT NULL DEFAULT TRUE",
 			"created_at": "DATETIME DEFAULT CURRENT_TIMESTAMP",
 		},
 	)
@@ -199,6 +216,7 @@ async def run_schema_migrations(conn):
 	await _ensure_ics_guild_event_import_unique(conn)
 	await _ensure_niconico_info_event_unique(conn)
 	await _ensure_message_analysis_log_unique(conn)
+	await _ensure_message_analysis_feedback_embedding_index(conn)
 	await _ensure_discord_user_unique(conn)
 	await _ensure_discord_channel_unique(conn)
 
@@ -367,6 +385,43 @@ async def _ensure_message_analysis_log_unique(conn):
 				"ADD UNIQUE INDEX `uq_message_analysis_log_message_id` (`message_id`)"
 			)
 		)
+
+
+async def _ensure_message_analysis_feedback_embedding_index(conn):
+	"""Create the feedback embedding lookup index when the table exists."""
+	tables = await conn.execute(
+		text(
+			"""
+			SELECT TABLE_NAME
+			FROM INFORMATION_SCHEMA.TABLES
+			WHERE TABLE_SCHEMA = DATABASE()
+			  AND TABLE_NAME = 'message_analysis_feedback'
+			"""
+		)
+	)
+	if tables.scalar_one_or_none() is None:
+		return
+
+	indexes = await conn.execute(
+		text(
+			"""
+			SELECT INDEX_NAME
+			FROM INFORMATION_SCHEMA.STATISTICS
+			WHERE TABLE_SCHEMA = DATABASE()
+			  AND TABLE_NAME = 'message_analysis_feedback'
+			  AND INDEX_NAME = 'idx_message_analysis_feedback_embedding'
+			"""
+		)
+	)
+	if indexes.first() is None:
+		await conn.execute(
+			text(
+				"ALTER TABLE `message_analysis_feedback` "
+				"ADD INDEX `idx_message_analysis_feedback_embedding` (`embedding_model`, `embedding_text_hash`)"
+			)
+		)
+
+
 async def _ensure_discord_user_unique(conn):
 	"""Create the Discord user duplicate-prevention index when the table exists."""
 	tables = await conn.execute(

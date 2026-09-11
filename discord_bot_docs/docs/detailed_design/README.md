@@ -23,6 +23,7 @@
 | [通知設定詳細](features/notification_config.md) | 汎用通知カテゴリ、通知先チャンネル、メンション設定 |
 | [リアクション自動化詳細](features/reaction_automation.md) | キーワード登録、NG 抑止、絵文字解析、自動リアクション |
 | [ダイスロール詳細](features/dice_roll.md) | `d20` 式評価、手動コマンド、自動ロール判定 |
+| [リアクション抽選詳細](features/reaction_lottery.md) | 抽選作成、応募リアクション取得、当選者選定、早期終了 |
 | [Ollama メッセージ分析詳細](features/ollama_message_analysis.md) | 投稿分析、しきい値判定、リアクション、DM、フィードバック |
 | [コミュニケーション傾向分析詳細](features/communication_trend.md) | 半期集計、Ollama レポート生成、集計結果保存 |
 | [P2PQuake 通知詳細](features/p2pquake_notification.md) | WebSocket 監視、地震/津波/緊急地震速報通知、画像生成 |

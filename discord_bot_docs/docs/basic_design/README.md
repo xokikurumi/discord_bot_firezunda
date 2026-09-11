@@ -10,6 +10,7 @@
 | 文書 | 内容 |
 |---|---|
 | [システム構成](common/system_architecture.md) | Bot 全体の構成と機能配置 |
+| [現行ソースコード構成](common/source_code_structure.md) | ローカル src のディレクトリ構成、主要責務、設定・データの流れ |
 | [起動・初期化設計](common/startup.md) | 起動時初期化と Cog 登録方針 |
 | [データ設計方針](common/data_design.md) | DB、ログ、設定、外部基礎データの扱い |
 | [外部連携設計](common/external_integrations.md) | Discord、外部 API、地図、AI 連携 |
@@ -26,6 +27,7 @@
 | [通知設定設計](features/notification_config.md) | 通知先、メンション、カテゴリ管理 |
 | [リアクション自動化設計](features/reaction_automation.md) | キーワード一致によるリアクション付与 |
 | [ダイスロール設計](features/dice_roll.md) | ダイス式評価 |
+| [リアクション抽選設計](features/reaction_lottery.md) | リアクション応募型の抽選 |
 | [Ollama メッセージ分析設計](features/ollama_message_analysis.md) | メッセージ内容分析 |
 | [コミュニケーション傾向分析設計](features/communication_trend.md) | 半期単位の傾向分析 |
 | [P2PQuake 通知設計](features/p2pquake_notification.md) | 地震・津波・緊急地震速報通知 |

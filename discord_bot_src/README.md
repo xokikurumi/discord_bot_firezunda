@@ -81,6 +81,39 @@ https://blog.nicovideo.jp/niconews/category/ge_maintenance
 https://blog.nicovideo.jp/niconews/category/ge_user/
 ```
 
+## Message Analysis Evaluation
+
+Confirmed administrator feedback can be used as an evaluation set for the current Ollama message analysis prompt and feedback RAG behavior.
+
+```bash
+python scripts/evaluate_message_analysis_feedback.py --limit 50
+```
+
+By default, exact-text feedback reuse is disabled during evaluation so the script does not trivially return the known correction for the same message. Feedback RAG remains enabled, but the current evaluation case is excluded from retrieved examples.
+
+Useful options:
+
+```bash
+python scripts/evaluate_message_analysis_feedback.py --guild-id 123456789 --limit 100 --json
+python scripts/evaluate_message_analysis_feedback.py --limit 50 --no-rag
+python scripts/evaluate_message_analysis_feedback.py --limit 50 --dry-run
+```
+
+Feedback RAG can optionally use Ollama embeddings. Enable it after installing an embedding model such as `nomic-embed-text`.
+
+```env
+OLLAMA_ANALYSIS_FEEDBACK_EMBEDDING_RAG_ENABLED=true
+OLLAMA_EMBEDDING_MODEL=nomic-embed-text:latest
+```
+
+Create embeddings for existing confirmed feedback rows before enabling or evaluating embedding RAG:
+
+```bash
+python scripts/backfill_message_analysis_feedback_embeddings.py --limit 0
+```
+
+Use `--force` when rebuilding embeddings after changing the embedding model or embedding text format.
+
 ## Start
 
 ```bash

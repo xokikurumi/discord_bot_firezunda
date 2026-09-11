@@ -18,11 +18,13 @@ from cogs.messages.base.message_reaction_cog import MessageReactionCog
 from cogs.messages.base.message_watcher_cog import MessageWatcherCog
 from cogs.messages.base.analysis_cog import AnalysisCog
 from cogs.messages.base.dice_roll_cog import DiceRollCog
+from cogs.messages.base.reaction_lottery_cog import ReactionLotteryCog
 from services.log.messageLogService import MessageLogService
 from services.log.voiceStatusLogService import VoiceChannelStatusService
 from services.base.message_reaction_service import MessageReactionService
 from services.base.messageWatcherService import MessageWatcherService
 from services.base.dice_roll_service import DiceRollService
+from services.base.reaction_lottery_service import ReactionLotteryService
 from services.base.p2pquake_service import P2PQuakeService
 from services.task.ics_guild_event_service import IcsGuildEventService
 from services.task.communication_trend_service import CommunicationTrendService
@@ -79,6 +81,10 @@ class Container:
 	def create_dice_roll_service(self):
 		"""Create the dice roll service."""
 		return DiceRollService()
+
+	def create_reaction_lottery_service(self):
+		"""Create the reaction lottery service."""
+		return ReactionLotteryService()
 
 	def create_p2pquake_service(self):
 		"""Create the P2PQuake WebSocket notification service."""
@@ -148,6 +154,7 @@ async def setup_cogs():
 	reaction_service = container.create_message_reaction_service()
 	watcher_service = container.create_message_watcher_service()
 	dice_roll_service = container.create_dice_roll_service()
+	reaction_lottery_service = container.create_reaction_lottery_service()
 	p2pquake_service = container.create_p2pquake_service()
 	ics_guild_event_service = container.create_ics_guild_event_service()
 	communication_trend_service = container.create_communication_trend_service()
@@ -160,6 +167,7 @@ async def setup_cogs():
 	await bot.add_cog(MessageWatcherCog(bot, watcher_service))
 	await bot.add_cog(AnalysisCog(bot, watcher_service))
 	await bot.add_cog(DiceRollCog(bot, dice_roll_service))
+	await bot.add_cog(ReactionLotteryCog(bot, reaction_lottery_service))
 	await bot.add_cog(P2PQuakeCog(bot, p2pquake_service))
 	await bot.add_cog(IcsGuildEventCog(bot, ics_guild_event_service))
 	await bot.add_cog(CommunicationTrendCog(bot, communication_trend_service))

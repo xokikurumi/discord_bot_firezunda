@@ -10,7 +10,7 @@
 | コマンド方式 | `commands.hybrid_command`、`commands.hybrid_group` |
 | prefix | `!` |
 | slash command | 対応 |
-| 生成日 | 2026-07-15 |
+| 生成日 | 2026-09-11 |
 
 `hybrid_command` / `hybrid_group` で実装されているため、多くのコマンドは `!command` と `/command` の両方で利用できます。
 ただし、slash command の反映は Discord 側の同期状態に依存します。
@@ -134,6 +134,52 @@ slash command で実行した場合、開始・終了メッセージは ephemera
 
 `channel` 未指定時は、コマンドを実行したチャンネルが通知先になります。
 
+### 3.9 Ollama メッセージ分析
+
+実装ファイル: `cogs/messages/base/analysis_cog.py`
+
+| コマンド | slash command | 権限 | 用途 |
+|---|---|---|---|
+| `!analysis` | `/analysis` | サーバー限定 | 分析管理コマンドの使用方法を表示する |
+| `!analysis feedback <message_id> <label> [reason_tag] [note]` | `/analysis feedback message_id:<id> label:<label> reason_tag:<reason_tag> note:<note>` | 管理者 | 保存済み分析結果に対する管理者フィードバックと理由タグを登録する |
+| `!analysis whitelist` | `/analysis whitelist` | 管理者 | 分析除外ルールコマンドの使用方法を表示する |
+| `!analysis whitelist add <text_exact\|text_contains\|user\|channel> <pattern>` | `/analysis whitelist add rule_type:<type> pattern:<pattern>` | 管理者 | 分析除外ルールを追加する |
+| `!analysis whitelist list [all]` | `/analysis whitelist list include_disabled:<all>` | 管理者 | 分析除外ルールを一覧表示する |
+| `!analysis whitelist enable <id>` | `/analysis whitelist enable rule_id:<id>` | 管理者 | 分析除外ルールを有効化する |
+| `!analysis whitelist disable <id>` | `/analysis whitelist disable rule_id:<id>` | 管理者 | 分析除外ルールを無効化する |
+
+`label` は `correct`、`false_positive`、`false_negative`、`unsure` とそれぞれの alias を受け付けます。
+`reason_tag` は次の値を受け付けます。
+
+- `unspecified`
+- `meme`
+- `inside_joke`
+- `game_context`
+- `external_news_comment`
+- `external_criticism`
+- `sexual_banter`
+- `roleplay`
+- `quote`
+- `direct_attack`
+- `intimidation`
+slash command では label と reason tag が日本語補足付きの選択肢として表示されます。
+prefix command で reason tag として解釈できない第 3 引数は、従来互換のため note として扱われます。
+`user` と `channel` の除外ルールは Discord ID を指定します。
+
+### 3.10 リアクション抽選
+
+実装ファイル: `cogs/messages/base/reaction_lottery_cog.py`
+
+| コマンド | slash command | 権限 | 用途 |
+|---|---|---|---|
+| `!lottery` | `/lottery` | サーバー限定 | 抽選コマンドの使用方法を表示する |
+| `!lottery start [winners] [end] [emoji] [title]` | `/lottery start winners:<count> end:<duration_or_datetime> title:<emoji_and_title>` | サーバー内利用者 | 応募リアクションによる抽選を開始する |
+| `!lottery end <message_id>` | `/lottery end message_id:<id>` | 作成者またはメッセージ管理権限 | 実行中の抽選を早期終了する |
+
+`end` は `30m`、`2h`、`1d` などの相対時間、または `YYYY-MM-DD HH:MM` 形式などの日時を受け付けます。
+終了時刻は未来かつ 7 日以内である必要があります。
+`title` の先頭が絵文字またはカスタム絵文字の場合、その値を応募リアクションとして使用します。
+
 ## 4. コマンドではない自動処理
 
 以下は Discord コマンドではありませんが、Cog の listener または background task として実装されています。
@@ -150,10 +196,11 @@ slash command で実行した場合、開始・終了メッセージは ephemera
 | コミュニケーション傾向定期分析 | `cogs/tasks/communication_trend_cog.py` | 半期ごとの分析対象時期に傾向分析を実行する |
 | Niconico Info 定期確認 | `cogs/tasks/niconico_info_cog.py` | Niconico Info の対象 URL を定期確認する |
 | Niconico 投稿動画定期確認 | `cogs/tasks/niconico_user_video_cog.py` | 監視対象ユーザーの投稿動画を定期確認する |
+| Ollama メッセージ分析 | `cogs/messages/base/message_watcher_cog.py` | 投稿メッセージを分析し、結果保存・リアクション・通知を行う |
 
 ## 5. 集計
 
 | 区分 | 件数 |
 |---|---:|
-| 直接実行できるコマンド行 | 38 |
-| 自動処理 | 10 |
+| 直接実行できるコマンド行 | 46 |
+| 自動処理 | 11 |

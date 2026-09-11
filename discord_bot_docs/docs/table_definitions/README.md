@@ -11,6 +11,8 @@
 
 | テーブル名 | 分類 | 説明 |
 |---|---|---|
+| [`discord_channel`](tables/discord_channel.md) | 基礎データ・設定 | メッセージログで観測した Discord チャンネルの最新属性を保持します。 |
+| [`discord_user`](tables/discord_user.md) | 基礎データ・設定 | メッセージログで観測した Discord ユーザーの最新属性を保持します。 |
 | [`b_geolonia_address`](tables/b_geolonia_address.md) | 基礎データ・設定 | Geolonia住所データ。住所から緯度・経度を解決するために使用します。 |
 | [`b_geolonia_sync_state`](tables/b_geolonia_sync_state.md) | 基礎データ・設定 | Geolonia住所データ同期状態を管理します。 |
 | [`b_jma_shindo_station`](tables/b_jma_shindo_station.md) | 基礎データ・設定 | 気象庁震度観測点データ。観測地点の住所・緯度・経度を管理します。 |
@@ -25,6 +27,7 @@
 | [`ics_guild_event_import`](tables/ics_guild_event_import.md) | タスク・通知 | ICS予定イベントの取り込み済み状態を管理します。 |
 | [`message_analysis_feedback`](tables/message_analysis_feedback.md) | ログ | Ollamaメッセージ分析に対する管理者フィードバックを保存します。 |
 | [`message_analysis_log`](tables/message_analysis_log.md) | ログ | Ollamaによるメッセージ解析結果を保存します。 |
+| [`message_analysis_whitelist`](tables/message_analysis_whitelist.md) | ログ | Ollamaメッセージ分析の除外ルールを保存します。 |
 | [`message_delete_log`](tables/message_delete_log.md) | ログ | Discordメッセージ削除ログを保存します。 |
 | [`message_edit_log`](tables/message_edit_log.md) | ログ | Discordメッセージ編集ログを保存します。 |
 | [`message_log`](tables/message_log.md) | ログ | Discordメッセージ投稿ログを保存します。 |
@@ -39,6 +42,7 @@
 - [`communication_trend_analysis`](tables/communication_trend_analysis.md)
 - [`message_analysis_feedback`](tables/message_analysis_feedback.md)
 - [`message_analysis_log`](tables/message_analysis_log.md)
+- [`message_analysis_whitelist`](tables/message_analysis_whitelist.md)
 - [`message_delete_log`](tables/message_delete_log.md)
 - [`message_edit_log`](tables/message_edit_log.md)
 - [`message_log`](tables/message_log.md)
@@ -62,3 +66,5 @@
 - [`b_jma_sync_state`](tables/b_jma_sync_state.md)
 - [`b_notify_cannel_config`](tables/b_notify_cannel_config.md)
 - [`b_reaction_keywords`](tables/b_reaction_keywords.md)
+- [`discord_channel`](tables/discord_channel.md)
+- [`discord_user`](tables/discord_user.md)

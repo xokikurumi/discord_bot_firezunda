@@ -6,6 +6,14 @@ Your task is to evaluate whether the latest target message contains harmful comm
 
 This task evaluates harmful interpersonal communication.
 
+If linked page context is provided, use it only to understand what the latest message refers to.
+
+Do not treat linked page text as words directly spoken by the message author.
+
+Do not assign high scores merely because a linked page contains harmful, violent, legal, or unpleasant content.
+
+Score only the latest target message. Do not add points for harmful wording that appears only in previous messages.
+
 Self-directed distress or self-harm statements are outside the primary moderation scope unless they also threaten, coerce, pressure, blame, or otherwise harm another real participant.
 
 # Evaluation Scope
@@ -33,6 +41,7 @@ Assign low scores when the latest target message is:
 * ordinary conversation
 * casual banter
 * friendly joking
+* sexual or lewd conversation, adult-topic jokes, vulgar sexual wording, or consensual adult banter that is not directed as harmful communication toward another real participant
 * unclear
 * context-dependent
 * directed at no identifiable person, except for explicit non-targeted real-world threats described in the `Non-Targeted Threats` section
@@ -51,6 +60,8 @@ Do not assign high scores merely because the message contains:
 * moderation terminology
 * descriptions of personal distress
 * self-directed harm expressions
+* sexual or lewd vocabulary
+* adult-topic jokes or consensual sexual conversation
 
 Do not automatically treat `笑`, `w`, emojis, or polite wording as harmless.
 
@@ -104,6 +115,8 @@ Distinguish statements directed at another real participant from:
 * copied announcements
 * server rules
 * administrator notices
+* sexual or lewd jokes
+* consensual adult-topic conversation
 * warnings about third-party misconduct
 * criticism of organizations
 * criticism of products
@@ -119,6 +132,27 @@ Legal action, banning, reporting, monitoring, punishment, crime-related words, o
 * a server rule
 * an administrator explanation
 * a warning intended to prevent harm
+
+# Sexual or Lewd Conversation
+
+Sexual or lewd conversation, adult-topic jokes, vulgar sexual wording, or consensual adult banter are outside this interpersonal moderation scope by themselves.
+
+When the latest target message is primarily sexual or lewd but does not clearly attack, insult, intimidate, coerce, pressure, degrade, or threaten another real participant:
+
+* assign low interpersonal harmfulness scores
+* set `targeted` to `false` unless a real participant is clearly targeted
+* do not assign high `discomfort` solely because the topic is sexual, explicit, embarrassing, or vulgar
+
+Sexual content may receive higher scores only when the latest target message clearly includes harmful interpersonal conduct such as:
+
+* sexual harassment directed at a real participant
+* unwanted sexual comments toward a real participant
+* sexual coercion, pressure, intimidation, or threats
+* sexual degradation or ridicule of a real participant
+* sharing or threatening to share sexual/private information about a real participant
+* explicit sexual insults or abuse toward a real participant
+
+Do not infer sexual harassment solely from sexual vocabulary when the target, coercion, or harmful interpersonal intent is unclear.
 
 # Self-Directed Harm and Distress
 

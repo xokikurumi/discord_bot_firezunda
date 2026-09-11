@@ -101,12 +101,39 @@ mysql -h 127.0.0.1 -u discord_bot -p discord_bot
 | 機能 | 確認対象 |
 |---|---|
 | P2PQuake | `P2PQUAKE_ENABLED`、WebSocket 接続ログ、通知チャンネル設定 |
-| Ollama 分析 | `OLLAMA_ANALYSIS_ENABLED`、`OLLAMA_URL`、Ollama service |
+| Ollama 分析 | `OLLAMA_ANALYSIS_ENABLED`、`OLLAMA_URL`、prompt file、few-shot file、Ollama service |
 | ICS 予定 | `ICS_GUILD_EVENT_ENABLED`、`ICS_GUILD_EVENT_URL` |
 | Niconico Info | `NICONICO_INFO_ENABLED`、`NICONICO_INFO_TARGET_URLS` |
 | Niconico user video | `NICONICO_USER_VIDEO_ENABLED`、監視ユーザー設定 |
 
-## 9. GSI タイルキャッシュ
+## 9. 解析 feedback embedding
+
+embedding RAG を有効化する場合は、Ollama 側に embedding model があることを確認します。
+
+```bash
+ollama pull nomic-embed-text:latest
+```
+
+既存の確認済みフィードバックへ embedding を付与します。
+
+```bash
+cd /opt/discord/current
+sudo -u discord-bot .venv/bin/python scripts/backfill_message_analysis_feedback_embeddings.py --limit 0
+```
+
+embedding model や embedding 対象テキストの仕様を変えた場合は、force 指定で再生成します。
+
+```bash
+sudo -u discord-bot .venv/bin/python scripts/backfill_message_analysis_feedback_embeddings.py --limit 0 --force
+```
+
+解析挙動を確認済みフィードバックで評価します。
+
+```bash
+sudo -u discord-bot .venv/bin/python scripts/evaluate_message_analysis_feedback.py --limit 50
+```
+
+## 10. GSI タイルキャッシュ
 
 P2PQuake 通知画像で利用する地理院タイルは、事前キャッシュできます。
 

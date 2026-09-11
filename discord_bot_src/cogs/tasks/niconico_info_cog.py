@@ -38,7 +38,7 @@ class NiconicoInfoCog(commands.Cog):
 	async def niconico_info_filter(self, ctx):
 		"""Show usage for Niconico Info filter commands."""
 		await ctx.send(
-			"usage: !niconico_info_filter add <keyword> [include|exclude] | "
+			"usage: !niconico_info_filter add [include|exclude] <keyword> | "
 			"!niconico_info_filter list | "
 			"!niconico_info_filter enable <id> | "
 			"!niconico_info_filter disable <id> | "
@@ -48,10 +48,32 @@ class NiconicoInfoCog(commands.Cog):
 	@niconico_info_filter.command(name="add")
 	@commands.guild_only()
 	@commands.has_guild_permissions(administrator=True)
-	async def niconico_info_filter_add(self, ctx, keyword: str, mode: str = "include"):
+	async def niconico_info_filter_add(self, ctx, *, keyword: str):
 		"""Add a Niconico Info keyword filter."""
+		mode, keyword = self.parse_filter_add_args(keyword)
 		normalized_mode = await self.service.add_filter(ctx.guild.id, keyword, mode)
 		await ctx.send(f"Niconico info filter added: mode={normalized_mode}, keyword={keyword}")
+
+	def parse_filter_add_args(self, text: str):
+		"""Parse prefix-friendly filter mode and keyword text."""
+		tokens = str(text or "").strip().split()
+		if not tokens:
+			raise ValueError("keyword is required.")
+
+		mode = "include"
+		if self.is_filter_mode(tokens[0]):
+			mode = tokens.pop(0)
+		elif self.is_filter_mode(tokens[-1]):
+			mode = tokens.pop()
+
+		keyword = " ".join(tokens).strip()
+		if not keyword:
+			raise ValueError("keyword is required.")
+		return mode, keyword
+
+	def is_filter_mode(self, text: str):
+		"""Return True when text is a supported filter mode alias."""
+		return str(text or "").strip().casefold() in {"include", "allow", "only", "\u542b\u3080", "exclude", "ng", "deny", "\u9664\u5916"}
 
 	@niconico_info_filter.command(name="list")
 	@commands.guild_only()

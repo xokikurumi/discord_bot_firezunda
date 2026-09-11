@@ -14,8 +14,8 @@
 
 | 区分 | 主なテーブル |
 |---|---|
-| メッセージ・ボイスログ | `message_log`, `message_edit_log`, `message_delete_log`, `voice_status_log` |
-| AI 分析 | `message_analysis_log`, `message_analysis_feedback`, `communication_trend_analysis` |
+| メッセージ・ボイスログ | `message_log`, `message_edit_log`, `message_delete_log`, `voice_status_log`, `discord_user`, `discord_channel` |
+| AI 分析 | `message_analysis_log`, `message_analysis_feedback`, `message_analysis_whitelist`, `communication_trend_analysis` |
 | 通知設定 | `b_notify_cannel_config`, `b_niconico_notify_cannel_config` |
 | 外部データ | `b_geolonia_address`, `b_geolonia_sync_state`, `b_jma_shindo_station`, `b_jma_sync_state` |
 | ICS | `ics_guild_event_config`, `ics_guild_event_import` |

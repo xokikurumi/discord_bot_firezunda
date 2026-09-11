@@ -15,15 +15,16 @@ class MessageReactionCog(commands.Cog):
 	async def reaction_command(self, ctx):
 		"""Show usage when the reaction command group is called without a subcommand."""
 		await ctx.send(
-			"usage: !reaction add <keyword> <reaction> [ng_word] | "
+			"usage: !reaction add <reaction> <keyword> [ng_word] | "
 			"!reaction remove <keyword> | !reaction list | !reaction seed_syukka"
 		)
 
 	@reaction_command.command(name="add")
 	@commands.guild_only()
 	@commands.has_guild_permissions(administrator=True)
-	async def reaction_add(self, ctx, keyword: str, reaction: str, ng_word: str = "false"):
+	async def reaction_add(self, ctx, *, rule: str):
 		"""Register a keyword and its reaction for the current guild."""
+		keyword, reaction, ng_word = self.parse_reaction_add_args(rule)
 		# Store either a Unicode emoji or a custom emoji mention for this guild.
 		ng_word_flg = self.service.parse_bool(ng_word)
 		reaction_data = self.service.parse_reaction(reaction)
@@ -38,7 +39,7 @@ class MessageReactionCog(commands.Cog):
 	@reaction_command.command(name="remove")
 	@commands.guild_only()
 	@commands.has_guild_permissions(administrator=True)
-	async def reaction_remove(self, ctx, keyword: str):
+	async def reaction_remove(self, ctx, *, keyword: str):
 		"""Soft-delete a keyword rule for the current guild."""
 		# Keep history by soft-deleting instead of removing rows from the table.
 		deleted_count = await self.service.remove_keyword(ctx.guild.id, keyword)
@@ -47,6 +48,49 @@ class MessageReactionCog(commands.Cog):
 			return
 
 		await ctx.send(f"reaction keyword removed: keyword={keyword}, count={deleted_count}")
+
+	def parse_reaction_add_args(self, text: str):
+		"""Parse reaction add arguments for both prefix and slash command usage."""
+		tokens = str(text or "").strip().split()
+		if len(tokens) < 2:
+			raise ValueError("usage: !reaction add <reaction> <keyword> [ng_word]")
+
+		ng_word = "false"
+		if self.is_bool_token(tokens[-1]):
+			ng_word = tokens.pop()
+
+		if self.looks_like_reaction(tokens[0]):
+			reaction = tokens.pop(0)
+			keyword = " ".join(tokens).strip()
+		elif self.looks_like_reaction(tokens[-1]):
+			reaction = tokens.pop()
+			keyword = " ".join(tokens).strip()
+		else:
+			raise ValueError("reaction emoji is required.")
+
+		if not keyword:
+			raise ValueError("keyword is required.")
+		return keyword, reaction, ng_word
+
+	def is_bool_token(self, text: str):
+		"""Return True when text is a supported boolean token."""
+		return str(text or "").strip().casefold() in {
+			"true",
+			"false",
+			"1",
+			"0",
+			"yes",
+			"no",
+			"on",
+			"off",
+		}
+
+	def looks_like_reaction(self, text: str):
+		"""Return True when text looks like a Unicode or custom Discord emoji."""
+		token = str(text or "").strip()
+		if token.startswith(("<:", "<a:")) and token.endswith(">"):
+			return True
+		return bool(token) and not any(char.isalnum() for char in token)
 
 	@reaction_command.command(name="list")
 	@commands.guild_only()

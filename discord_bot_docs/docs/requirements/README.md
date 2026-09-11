@@ -18,6 +18,7 @@ Discord サーバー上で利用する Bot として、メッセージ記録、�
 | 機能要件 | [ボイス状態ログ](features/voice_logging.md) | ボイスチャンネル参加・退出・移動ログ |
 | 機能要件 | [リアクション自動化](features/reaction_automation.md) | キーワード反応、NG 条件、管理コマンド |
 | 機能要件 | [ダイスロール](features/dice_roll.md) | ダイス式評価、手動・自動ロール |
+| 機能要件 | [リアクション抽選](features/reaction_lottery.md) | リアクション応募、当選者抽選、早期終了 |
 | 機能要件 | [通知設定](features/notification_config.md) | 通知カテゴリ別の送信先管理 |
 | 機能要件 | [P2PQuake 通知](features/p2pquake_notification.md) | 地震・津波・緊急地震速報通知 |
 | 機能要件 | [Geolonia 住所同期](features/geolonia_address_sync.md) | 住所データ同期、同期履歴管理 |
@@ -37,6 +38,7 @@ Discord サーバー上で利用する Bot として、メッセージ記録、�
 | FR-VOICE | ボイス状態ログ |
 | FR-REACTION | リアクション自動化 |
 | FR-DICE | ダイスロール |
+| FR-LOTTERY | リアクション抽選 |
 | FR-NOTIFY | 通知設定 |
 | FR-QUAKE | P2PQuake 通知 |
 | FR-GEO | Geolonia 住所同期 |
